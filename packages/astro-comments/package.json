@@ -1,0 +1,19 @@
+{
+  "name": "@babelcoach/astro-comments",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Astro component for the BabelCoach comments service: bakes published comments into static pages and loads the widget.",
+  "exports": {
+    ".": "./index.js",
+    "./Comments.astro": "./Comments.astro"
+  },
+  "files": ["index.js", "index.d.ts", "render.js", "Comments.astro", "README.md"],
+  "keywords": ["astro-component"],
+  "peerDependencies": {
+    "astro": ">=5"
+  },
+  "scripts": {
+    "check": "tsc -p .",
+    "test": "vitest run"
+  }
+}

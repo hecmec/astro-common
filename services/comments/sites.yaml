@@ -1,0 +1,60 @@
+# Sites allowed to use the comments service.
+#
+# `domains` is the list of host names allowed to embed the service for that site
+# (production and staging). Pages on any other domain get nothing: the API, the
+# sign-in popup and the widget refuse them. A domain belongs to one site only.
+# To add a domain: add it here and redeploy the service.
+#
+# `dev_origins` are accepted only when the service runs with ALLOW_DEV_ORIGINS=true
+# (never in production).
+#
+# `bake_after_days`: published comments older than this are written into the
+# site's static HTML by its build (export endpoint).
+#
+# `reactions`: one-click reactions shown under each page (at most 8).
+# The labels below are placeholders to review.
+
+sites:
+  alt-web:
+    name: Alt Web
+    domains: [www.alt-web.org, alt-web.org, alt-web-staging.babelcoach.com]
+    dev_origins: [http://localhost:4325, http://localhost:4399]
+    languages: [en, fr, de]
+    bake_after_days: 7
+    reactions:
+      - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
+      - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
+      - { id: disagree, icon: "🤔", label: { en: I disagree, fr: Pas d’accord, de: Sehe ich anders } }
+
+  simplygoodfood:
+    name: Simply Good Food
+    domains: [www.simplygoodfood.eu, simplygoodfood.eu, simplygoodfood-staging.babelcoach.com]
+    dev_origins: [http://localhost:4321]
+    languages: [en, fr, de]
+    bake_after_days: 7
+    reactions:
+      - { id: yummy, icon: "😋", label: { en: Looks good, fr: Appétissant, de: Lecker } }
+      - { id: nice, icon: "👍", label: { en: Nice, fr: Bien, de: Gut } }
+      - { id: cooked, icon: "🍳", label: { en: I cooked it, fr: Je l’ai fait, de: Nachgekocht } }
+
+  anglais-gratuit:
+    name: Anglais gratuit
+    domains: [www.anglais-gratuit.org, anglais-gratuit.org, anglais-gratuit-staging.babelcoach.com]
+    dev_origins: [http://localhost:4326]
+    languages: [fr]
+    bake_after_days: 7
+    reactions:
+      - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
+      - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
+      - { id: disagree, icon: "🤔", label: { en: I disagree, fr: Pas d’accord, de: Sehe ich anders } }
+
+  bonetgratuit:
+    name: Bon et gratuit
+    domains: [www.bon-et-gratuit.fr, bon-et-gratuit.fr, bon-et-gratuit-staging.babelcoach.com]
+    dev_origins: [http://localhost:4327]
+    languages: [fr]
+    bake_after_days: 7
+    reactions:
+      - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
+      - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
+      - { id: disagree, icon: "🤔", label: { en: I disagree, fr: Pas d’accord, de: Sehe ich anders } }

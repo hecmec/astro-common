@@ -1,0 +1,13 @@
+{
+  "name": "@babelcoach/comments-widget",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "tsc -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

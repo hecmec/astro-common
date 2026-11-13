@@ -1,0 +1,24 @@
+{
+  "name": "@babelcoach/comments-service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "ALLOW_DEV_ORIGINS=true DEV_MODE=true node --watch src/server.ts",
+    "check": "tsc -p .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "backup": "node src/backup.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.6",
+    "hono": "4.13.16",
+    "nodemailer": "10.3.1",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/nodemailer": "8.0.2"
+  }
+}

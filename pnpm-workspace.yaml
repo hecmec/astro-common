@@ -1,0 +1,12 @@
+packages:
+  - services/*
+  - packages/*
+
+# Supply-chain guard: never install a version published less than 7 days ago
+# (direct or transitive). The hijacked npm versions of 2025-2026 were pulled
+# within hours.
+minimumReleaseAge: 10080
+
+# Dependency install scripts stay blocked; esbuild is the only allowed build.
+allowBuilds:
+  esbuild: true

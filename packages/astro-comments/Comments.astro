@@ -1,0 +1,42 @@
+---
+/**
+ * "Your reactions, your comments" section of a page.
+ * Bakes the comments the service has exported (published more than N days ago) into the
+ * HTML, then loads the widget for newer comments, reactions and the comment form.
+ *
+ *   <Comments site="alt-web" />
+ *
+ * Props: site (required), api (default: PUBLIC_COMMENTS_URL), path (default: current page),
+ * lang (default: Astro.currentLocale, then "en").
+ */
+import { fetchExport, renderSection } from './index.js';
+
+interface Props {
+  site: string;
+  api?: string;
+  path?: string;
+  lang?: string;
+}
+
+const { site, path = Astro.url.pathname, lang = Astro.currentLocale ?? 'en' } = Astro.props;
+const api = Astro.props.api ?? import.meta.env.PUBLIC_COMMENTS_URL;
+if (!api) throw new Error('astro-comments: pass the api prop or set PUBLIC_COMMENTS_URL');
+const data = await fetchExport(api, site);
+---
+
+<Fragment set:html={renderSection({ site, api, path, lang, data })} />
+
+<style is:global>
+  .bc-comments { margin-block: 2.5rem; }
+  .bc-comments > h2 { margin-bottom: .75em; }
+  .bc-static-reactions { display: flex; flex-wrap: wrap; gap: .5em; list-style: none; padding: 0; margin: 0 0 1em; }
+  .bc-static-reactions li { padding: .35em .8em; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: 2em; font-size: .9em; }
+  .bc-baked { display: grid; gap: .75em; }
+  .bc-baked:not(:empty) { margin-top: .75em; }
+  .bc-comment { border: 1px solid var(--bc-border, color-mix(in srgb, currentColor 20%, transparent)); border-radius: var(--bc-radius, .6rem); padding: .75em 1em; background: var(--bc-surface, transparent); }
+  .bc-comment header { font-size: .9em; }
+  .bc-comment time { color: var(--bc-muted, color-mix(in srgb, currentColor 65%, transparent)); margin-left: .4em; }
+  .bc-comment p { margin: .4em 0 0; overflow-wrap: anywhere; }
+  .bc-comment a { color: var(--bc-accent, inherit); }
+  .bc-reply { margin-top: .6em; padding: .5em .8em; border-left: 3px solid var(--bc-accent, currentColor); font-size: .95em; }
+</style>
