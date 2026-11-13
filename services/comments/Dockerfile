@@ -35,6 +35,6 @@ RUN mkdir -p /data && chown node:node /data
 USER node
 VOLUME /data
 EXPOSE 4330
-HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://127.0.0.1:4330/healthz || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost:4330/healthz || exit 1
 WORKDIR /app/services/comments
 CMD ["node", "src/server.ts"]
