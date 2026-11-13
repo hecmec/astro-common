@@ -1,6 +1,6 @@
 import { type Context, Hono } from 'hono';
 import { deleteCookie, getCookie } from 'hono/cookie';
-import { html } from 'hono/html';
+import { html, raw } from 'hono/html';
 import type { Deps } from '../context.ts';
 import { layout } from '../pages.ts';
 import {
@@ -8,6 +8,7 @@ import {
   MAX_COMMENTS_PER_PAGE,
   type Status,
   type User,
+  countByStatus,
   createFlow,
   deleteSession,
   getComment,
@@ -77,28 +78,41 @@ export function adminRoutes(deps: Deps): Hono<Env> {
     const siteId = sites.has(c.req.query('site') ?? '') ? c.req.query('site') : undefined;
     const path = normalizePath(c.req.query('path')) ?? undefined;
     const rows = listComments(db, { status, siteId, path });
-    const pendingCount = listComments(db, { status: 'pending', limit: 1000 }).length;
+    const counts = countByStatus(db, { siteId, path });
+    const pendingAll = countByStatus(db).pending;
+    const scope = [siteId ? sites.get(siteId)!.name : 'all sites', path].filter(Boolean).join(', ');
+    // Tabs keep the site and page filters; the filter form keeps the status.
+    const tabUrl = (s: Status) => {
+      const q = new URLSearchParams({ status: s });
+      if (siteId) q.set('site', siteId);
+      if (path) q.set('path', path);
+      return `/admin?${q}`;
+    };
     return c.html(
       layout({
-        title: `Comments admin (${pendingCount} pending)`,
+        title: `Comments admin (${pendingAll} pending)`,
         wide: true,
         body: html`
           <div class="row" style="justify-content: space-between">
-            <h1>Comments: ${status} (${rows.length})</h1>
+            <h1>Comments</h1>
             <form method="post" action="/admin/logout"><button class="btn small secondary">Sign out</button></form>
           </div>
+          <nav class="tabs" aria-label="Status">
+            ${STATUSES.map(
+              (s) => html`<a href="${tabUrl(s)}" class="tab" ${s === status ? raw('aria-current="page"') : ''}>${s[0]!.toUpperCase() + s.slice(1)} <span class="count">${counts[s]}</span></a>`,
+            )}
+          </nav>
           <form class="filters" method="get" action="/admin">
-            <select name="status" aria-label="Status">
-              ${STATUSES.map((s) => html`<option value="${s}" ${s === status ? 'selected' : ''}>${s}${s === 'pending' ? ` (${pendingCount})` : ''}</option>`)}
-            </select>
+            <input type="hidden" name="status" value="${status}">
             <select name="site" aria-label="Site">
               <option value="">All sites</option>
               ${[...sites.values()].map((s) => html`<option value="${s.id}" ${s.id === siteId ? 'selected' : ''}>${s.name}</option>`)}
             </select>
-            <input name="path" type="text" placeholder="/page/path/" value="${path ?? ''}" aria-label="Page path">
-            <button class="btn small">Filter</button>
+            <input name="path" type="text" placeholder="/page/path/ (optional)" value="${path ?? ''}" aria-label="Page path" autocomplete="off">
+            <button class="btn small">Apply</button>
+            ${siteId || path ? html`<a href="${`/admin?status=${status}`}" class="muted">Clear filters</a>` : ''}
           </form>
-          ${rows.length === 0 ? html`<p class="notice">Nothing here.</p>` : ''}
+          ${rows.length === 0 ? html`<p class="notice">No ${status} comments for ${scope}.</p>` : ''}
           ${rows.map(
             (r) => html`<article class="card">
               <div class="row muted">

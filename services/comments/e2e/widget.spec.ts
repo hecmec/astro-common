@@ -28,7 +28,7 @@ async function adminPublishAll(context: BrowserContext, reply?: string) {
   const admin = await context.newPage();
   await admin.goto(`${SERVICE}/admin/login`);
   await admin.getByRole('button', { name: 'Dev sign-in' }).click();
-  await expect(admin.getByRole('heading', { name: /Comments: pending/ })).toBeVisible();
+  await expect(admin.getByRole('navigation', { name: 'Status' })).toBeVisible();
   while (await admin.getByRole('button', { name: 'Publish' }).count()) {
     await admin.getByRole('button', { name: 'Publish' }).first().click();
   }

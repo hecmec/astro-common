@@ -72,4 +72,5 @@
 - [x] 9.7 German strings with the formal "Sie" in the widget, the popup, the emails and the baked heading, matching the German sites; verify the browser tests in German
 - [x] 9.8 Notices by kind: a confirmation after posting (accent bar and check mark), errors in the danger colour, neither looking like a field; verify the browser test for the success notice and screenshots
 - [x] 9.9 Reaction counts shown from 1 only; verify the browser test on the button text before and after reacting
-- [ ] 9.10 Tag `comments-v1.1.0` (astro-comments 1.1.0: formal German heading) and update the sites to it
+- [x] 9.10 Tag `comments-v1.1.0` (astro-comments 1.1.0: formal German heading) and update the sites to it
+- [x] 9.11 Admin page: status tabs with counts (one click, keeping the site and page filters) instead of a status drop-down applied by the filter button; path field without browser autofill; empty state naming the status and scope; verify the tabs unit test and the browser test

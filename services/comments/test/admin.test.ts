@@ -36,6 +36,34 @@ describe('moderation', () => {
     expect(await (await a.get('/admin')).text()).not.toContain('Please add a repair café');
   });
 
+  it('shows status tabs with counts that keep the site and page filters', async () => {
+    const s = setup({ devMode: true });
+    const a = await admin(s);
+    const { token } = s.reader('ana@example.org');
+    const first = await post(s, token, 'first one');
+    await post(s, token, 'second one');
+    await a.act(`/admin/comments/${first}/publish`);
+
+    const pending = await (await a.get('/admin')).text();
+    expect(pending).toMatch(/aria-current="page">Pending <span class="count">1<\/span>/);
+    expect(pending).toContain('Published <span class="count">1</span>');
+    expect(pending).toContain('second one');
+    expect(pending).not.toContain('first one');
+    expect(pending).toContain('autocomplete="off"');
+
+    const published = await (await a.get('/admin?status=published')).text();
+    expect(published).toMatch(/aria-current="page">Published/);
+    expect(published).toContain('first one');
+    expect(published).not.toContain('second one');
+
+    // filtered by site: tab links keep the filter, counts follow it
+    const filtered = await (await a.get('/admin?status=published&site=simplygoodfood')).text();
+    expect(filtered).toContain('href="/admin?status=pending&amp;site=simplygoodfood"');
+    expect(filtered).toContain('No published comments for Simply Good Food.');
+    expect(filtered).toContain('Pending <span class="count">0</span>');
+    expect(filtered).toContain('Clear filters');
+  });
+
   it('refuses, unpublishes and republishes', async () => {
     const s = setup({ devMode: true });
     const a = await admin(s);

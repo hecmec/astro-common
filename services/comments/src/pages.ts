@@ -32,6 +32,10 @@ const STYLE = `
   .filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
   .filters select, .filters input { width: auto; }
   nav a { margin-right: 1rem; color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: .25rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  .tab { padding: .5rem .9rem; border: 1px solid transparent; border-bottom: none; border-radius: .5rem .5rem 0 0; color: var(--muted); text-decoration: none; margin-bottom: -1px; }
+  .tab[aria-current] { color: var(--fg); border-color: var(--line); background: var(--bg); font-weight: 600; }
+  .tab .count { font-size: .8rem; padding: .05rem .45rem; border-radius: 1rem; background: var(--line); color: var(--fg); }
   .badge { font-size: .75rem; padding: .1rem .45rem; border-radius: 1rem; border: 1px solid var(--line); }
 `;
 

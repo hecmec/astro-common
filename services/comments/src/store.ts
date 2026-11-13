@@ -298,6 +298,20 @@ export function listComments(
     .all(...params, f.limit ?? 200) as unknown as (CommentRow & { email: string | null; blocked_at: number | null })[];
 }
 
+/** Number of comments per status, optionally for one site and/or page. */
+export function countByStatus(db: DB, f: { siteId?: string; path?: string } = {}): Record<Status, number> {
+  const where: string[] = [];
+  const params: string[] = [];
+  if (f.siteId) (where.push('site_id = ?'), params.push(f.siteId));
+  if (f.path) (where.push('path = ?'), params.push(f.path));
+  const rows = db
+    .prepare(`SELECT status, COUNT(*) AS n FROM comments ${where.length ? `WHERE ${where.join(' AND ')}` : ''} GROUP BY status`)
+    .all(...params) as { status: Status; n: number }[];
+  const counts: Record<Status, number> = { pending: 0, published: 0, refused: 0 };
+  for (const r of rows) counts[r.status] = r.n;
+  return counts;
+}
+
 export function setBlocked(db: DB, userId: number, blocked: boolean, now: number): void {
   transaction(db, () => {
     db.prepare('UPDATE users SET blocked_at = ? WHERE id = ?').run(blocked ? now : null, userId);
