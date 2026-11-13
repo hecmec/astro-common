@@ -69,3 +69,7 @@
 - [x] 9.4 Comment length 1–500 characters in the API and the widget; verify the length test
 - [x] 9.5 Admin notification at most every 6 hours; verify the notification test
 - [x] 9.6 Comments listed most recent first (page endpoint, export, widget, baked section), the widget with the form above the baked comments; verify the order tests and the browser test that a live comment shows above a baked one
+- [x] 9.7 German strings with the formal "Sie" in the widget, the popup, the emails and the baked heading, matching the German sites; verify the browser tests in German
+- [x] 9.8 Notices by kind: a confirmation after posting (accent bar and check mark), errors in the danger colour, neither looking like a field; verify the browser test for the success notice and screenshots
+- [x] 9.9 Reaction counts shown from 1 only; verify the browser test on the button text before and after reacting
+- [ ] 9.10 Tag `comments-v1.1.0` (astro-comments 1.1.0: formal German heading) and update the sites to it

@@ -51,7 +51,7 @@ class Widget {
   private readonly mount: HTMLElement;
   private readonly path = location.pathname;
   private data: PageData | null = null;
-  private notice: { text: string; error?: boolean; link?: string } | null = null;
+  private notice: { text: string; error?: boolean; success?: boolean; link?: string } | null = null;
   private signingIn = false;
   private confirmingDelete = false;
   private draft = '';
@@ -213,7 +213,7 @@ class Widget {
     const { comment } = (await res.json()) as { comment: Comment };
     this.data?.comments.unshift(comment);
     this.draft = '';
-    this.notice = { text: this.t('posted') };
+    this.notice = { text: this.t('posted'), success: true };
     this.render();
   }
 
@@ -285,8 +285,9 @@ class Widget {
             onclick: () => this.react(r),
           },
           h('span', { 'aria-hidden': 'true' }, r.icon),
-          ` ${r.label} `,
-          h('span', { class: 'count' }, String(r.count)),
+          ` ${r.label}`,
+          // Counts only from 1: a row of zeros reads as noise.
+          r.count > 0 ? [' ', h('span', { class: 'count' }, String(r.count))] : null,
         ),
       ),
     );
@@ -367,7 +368,8 @@ class Widget {
     const notice = this.notice
       ? h(
           'p',
-          { class: `notice${this.notice.error ? ' error' : ''}`, role: 'status' },
+          { class: `notice${this.notice.error ? ' error' : this.notice.success ? ' success' : ''}`, role: 'status' },
+          this.notice.success ? h('span', { class: 'icon', 'aria-hidden': 'true' }, '✓') : null,
           this.notice.text,
           this.notice.link ? [' ', h('a', { href: this.notice.link, target: '_blank', rel: 'noopener' }, this.notice.link)] : null,
         )
@@ -381,7 +383,7 @@ class Widget {
           notice,
           this.renderFooter(d),
           d.comments.length ? h('div', { class: 'comments' }, d.comments.map((c) => this.renderComment(c))) : null,
-          !d.comments.length && !this.bakedCount() ? h('p', { class: 'muted' }, t('empty')) : null,
+          !d.comments.length && !this.bakedCount() ? h('p', { class: 'muted empty' }, t('empty')) : null,
         ]
       : [notice];
     this.root.replaceChildren(

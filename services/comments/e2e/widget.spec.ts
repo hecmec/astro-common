@@ -53,12 +53,16 @@ test('a reader signs in, comments, reacts; the admin publishes and replies', asy
 
   await w.getByLabel('Votre commentaire', { exact: true }).fill('Très bonne adresse.\nVoir https://example.org <b>gras</b>');
   await w.getByRole('button', { name: 'Envoyer' }).click();
-  await expect(w.getByText('Merci ! Votre commentaire apparaîtra une fois relu.')).toBeVisible();
+  const thanks = w.getByText('Merci ! Votre commentaire apparaîtra une fois relu.');
+  await expect(thanks).toBeVisible();
+  await expect(w.locator('.notice.success')).toContainText('Merci !'); // styled as a confirmation, not like a field
   await expect(w.getByText('En attente de modération')).toBeVisible();
 
+  await expect(w.getByRole('button', { name: /Utile/ })).toHaveText(/^👍 Utile$/); // no count while 0
   await w.getByRole('button', { name: /Utile/ }).click();
   await expect(w.getByRole('button', { name: /Utile/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(w.getByRole('button', { name: /Utile/ })).toContainText('1');
+  await expect(w.getByRole('button', { name: /Utile/ })).toHaveText(/^👍 Utile 1$/);
+  await expect(w.getByRole('button', { name: /Je l’utilise/ })).toHaveText(/^✅ Je l’utilise$/);
 
   // Another visitor sees the reaction count but not the pending comment
   const visitor = await context.browser()!.newContext();
@@ -87,7 +91,7 @@ test('a reader signs in, comments, reacts; the admin publishes and replies', asy
 
 test('the widget speaks the page language', async ({ page }) => {
   await page.goto('/other/?lang=de');
-  await expect(page.locator('[data-bc-comments]').getByRole('heading', { name: 'Deine Reaktionen, deine Kommentare' })).toBeVisible();
+  await expect(page.locator('[data-bc-comments]').getByRole('heading', { name: 'Ihre Reaktionen, Ihre Kommentare' })).toBeVisible();
   await page.goto('/other/?lang=en');
   await expect(page.locator('[data-bc-comments]').getByRole('heading', { name: 'Your reactions, your comments' })).toBeVisible();
 });

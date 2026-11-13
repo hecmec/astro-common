@@ -13,6 +13,7 @@ h2 { font-size: 1.3em; margin: 0 0 .75em; }
 p { margin: 0 0 .75em; }
 .muted { color: var(--muted); font-size: .9em; }
 .small { font-size: .8em; }
+.empty { margin-top: 1em; }
 .reactions { display: flex; flex-wrap: wrap; gap: .5em; margin-bottom: 1em; }
 .reaction { font: inherit; font-size: .9em; padding: .35em .8em; border: 1px solid var(--border); border-radius: 2em; background: var(--surface); color: inherit; cursor: pointer; }
 .reaction[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
@@ -38,8 +39,10 @@ textarea, input[type=text] { width: 100%; box-sizing: border-box; font: inherit;
 .btn.danger { background: transparent; border-color: var(--danger); color: var(--danger); }
 .link { font: inherit; font-size: .9em; padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline; cursor: pointer; }
 .comment > .link { margin-top: .4em; }
-.notice { padding: .6em .9em; border: 1px solid var(--border); border-radius: var(--radius); }
-.notice.error { border-color: var(--danger); }
+.notice { padding: .55em .9em; border-left: 3px solid var(--border); border-radius: calc(var(--radius) * .5); background: color-mix(in srgb, currentColor 5%, transparent); font-size: .95em; }
+.notice.success { border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.notice.error { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.notice .icon { font-weight: 700; color: var(--accent); margin-right: .4em; }
 .account { margin-top: .75em; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 `;

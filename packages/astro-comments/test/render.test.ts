@@ -121,3 +121,11 @@ describe('fetchExport', () => {
     expect(logger.warn).toHaveBeenCalled();
   });
 });
+
+describe('German', () => {
+  it('addresses the reader formally, like the German sites', () => {
+    const html = renderSection({ site: 'alt-web', api: API, path: '/tag/vrac/', lang: 'de', data });
+    expect(html).toContain('Ihre Reaktionen, Ihre Kommentare');
+    expect(html).not.toMatch(/\bdeine?\b/i);
+  });
+});

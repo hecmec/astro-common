@@ -27,8 +27,12 @@ A signed-in reader SHALL be able to toggle each reaction kind on a page, at most
 - **THEN** the counts do not change and the sign-in options are shown
 
 ### Requirement: Public counts
-Anyone SHALL see the count of each reaction kind on a page; who reacted SHALL not be public.
+Anyone SHALL see the count of each reaction kind on a page once it is at least 1 (a kind nobody chose shows its label without a number); who reacted SHALL not be public.
 
 #### Scenario: Anonymous visitor
 - **WHEN** a visitor who is not signed in loads a page
 - **THEN** they see the reaction counts and no names
+
+#### Scenario: Kind nobody chose
+- **WHEN** no reader has chosen "I use it" on a page
+- **THEN** its button shows the label without a count

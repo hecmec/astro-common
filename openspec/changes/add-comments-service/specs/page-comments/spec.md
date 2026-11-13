@@ -92,6 +92,14 @@ Under a page, the widget SHALL show a section titled "Your reactions, your comme
 - **WHEN** the widget loads on a page whose `lang` is `fr`
 - **THEN** all its labels are in French
 
+#### Scenario: German page
+- **WHEN** the widget loads on a page whose `lang` is `de`
+- **THEN** its labels address the reader formally ("Sie"), like the German sites, and so do the sign-in popup and the emails
+
+#### Scenario: Comment sent
+- **WHEN** a reader sends a comment
+- **THEN** a confirmation that it will appear once read is shown, styled as a confirmation and not like an input field
+
 #### Scenario: Page without comments
 - **WHEN** a page has no published comments
 - **THEN** the section shows the reactions and an invitation to be the first to comment

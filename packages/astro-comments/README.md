@@ -7,13 +7,13 @@ The "Your reactions, your comments" section under a page of a BabelCoach site. A
 1. Dependency, pinned to a tag of the public astro-common repo:
 
    ```json
-   "@babelcoach/astro-comments": "github:hecmec/astro-common#comments-v1.0.0&path:packages/astro-comments"
+   "@babelcoach/astro-comments": "github:hecmec/astro-common#comments-v1.1.0&path:packages/astro-comments"
    ```
 
 2. Build variable with the service URL (in `.env` for development, as a Coolify build variable for staging and production):
 
    ```
-   PUBLIC_COMMENTS_URL=https://comments.babelcoach.com
+   PUBLIC_COMMENTS_URL=https://astro-common-comments.babelcoach.com
    ```
 
 3. The site's domains must be listed under its id in the service's `sites.yaml`.

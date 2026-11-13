@@ -6,7 +6,7 @@
 export const labels = {
   en: { heading: 'Your reactions, your comments', formerReader: 'Former reader', replyFrom: 'Reply from {site}' },
   fr: { heading: 'Vos réactions, vos commentaires', formerReader: 'Ancien lecteur', replyFrom: 'Réponse de {site}' },
-  de: { heading: 'Deine Reaktionen, deine Kommentare', formerReader: 'Ehemalige Person', replyFrom: 'Antwort von {site}' },
+  de: { heading: 'Ihre Reaktionen, Ihre Kommentare', formerReader: 'Ehemalige Person', replyFrom: 'Antwort von {site}' },
 };
 
 /** @param {unknown} value @returns {Lang} */
