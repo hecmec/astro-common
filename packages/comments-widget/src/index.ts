@@ -402,3 +402,6 @@ function init() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+// Sites using Astro's ClientRouter swap pages without reloading, and this script runs only once:
+// mount the section of each new page too (sections already rendered are skipped).
+document.addEventListener('astro:page-load', init);

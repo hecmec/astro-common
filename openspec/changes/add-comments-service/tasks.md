@@ -74,3 +74,4 @@
 - [x] 9.9 Reaction counts shown from 1 only; verify the browser test on the button text before and after reacting
 - [x] 9.10 Tag `comments-v1.1.0` (astro-comments 1.1.0: formal German heading) and update the sites to it
 - [x] 9.11 Admin page: status tabs with counts (one click, keeping the site and page filters) instead of a status drop-down applied by the filter button; path field without browser autofill; empty state naming the status and scope; verify the tabs unit test and the browser test
+- [x] 9.12 Widget mounts again on `astro:page-load`, for sites using Astro's ClientRouter (alt-web's previous/next box swaps pages without reloading, and the script runs once); verify the page-swap browser test and the next/back replay on alt-web staging

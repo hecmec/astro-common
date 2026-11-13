@@ -143,3 +143,23 @@ test('the widget shows nothing on a domain that is not allowed', async ({ page }
   });
   expect(res.status()).toBe(403);
 });
+
+test('the widget mounts again after an Astro ClientRouter page swap', async ({ page }) => {
+  await page.goto('/swap-a/?lang=en&cat=food');
+  await expect(page.locator('[data-bc-comments]').getByRole('heading', { name: 'Your reactions, your comments' })).toBeVisible();
+  const requested: string[] = [];
+  page.on('request', (r) => r.url().includes('/page?') && requested.push(new URL(r.url()).searchParams.get('path')!));
+  // What ClientRouter does: new URL (query kept), new page content, then astro:page-load.
+  await page.evaluate(() => {
+    history.pushState(null, '', '/swap-b/?cat=food');
+    const old = document.querySelector('[data-bc-comments]')!;
+    const fresh = document.createElement('div');
+    fresh.setAttribute('data-bc-comments', '');
+    fresh.dataset.site = 'alt-web';
+    fresh.dataset.api = 'http://localhost:4398';
+    old.replaceWith(fresh);
+    document.dispatchEvent(new Event('astro:page-load'));
+  });
+  await expect(page.locator('[data-bc-comments]').getByRole('heading', { name: 'Your reactions, your comments' })).toBeVisible();
+  expect(requested).toEqual(['/swap-b/']); // the new page, without its query
+});
