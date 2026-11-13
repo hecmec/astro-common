@@ -47,7 +47,14 @@ A site's dev server (e.g. alt-web on :4325) can then embed the widget with `data
 
 ## Deploy (Coolify)
 
+Live at https://astro-common-comments.babelcoach.com: Coolify project `astro-common` (uuid `ed4xjd7fl1luhtmjfjmeqobm`), environment `production`, application `comments` (uuid `opd326ygqkelvk9qywly16rl`), from `hecmec/astro-common` branch `main` through the GitHub App `hecmec-coolify`, auto-deploy on push. The domain is covered by the `*.babelcoach.com` wildcard. To release, merge `develop` into `main` and push.
+
+**Coolify API**: the token of this project goes in the git-ignored `.env` at the repository root as `COOLIFY_ASTRO_COMMON_API_URL=https://coolify.babelcoach.com` and `COOLIFY_ASTRO_COMMON_API_TOKEN=<id>|<secret>` (with `read:sensitive`, to read logs). The token contains a `|`, so read it with a script rather than `source`. With `Authorization: Bearer <token>`: `GET /api/v1/applications/<uuid>` (status), `GET /api/v1/applications/<uuid>/logs?lines=100`, `GET /api/v1/deployments/applications/<uuid>` (deployments), `POST /api/v1/deploy` with `{"uuid": "<uuid>"}`, `POST /api/v1/applications/<uuid>/restart` after changing variables.
+
+Settings:
+
 - Build pack Dockerfile, file `services/comments/Dockerfile`, build context the repository root, port 4330.
+- Health check `/healthz` on port 4330 (the service listens on IPv6 and IPv4: in the image `localhost` is `::1`).
 - Persistent volume on `/data`.
 - Runtime variables: `BASE_URL`, `ADMIN_EMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SMTP_URL`, `MAIL_FROM`, `TRUST_PROXY=true`.
 - The mail sender's domain needs SPF, DKIM and DMARC, or sign-in links land in spam.
