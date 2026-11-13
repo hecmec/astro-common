@@ -6,7 +6,7 @@ import { googleProvider } from './google.ts';
 import { createMailer } from './mailer.ts';
 import { Notifier } from './notify.ts';
 import { loadSites } from './sites.ts';
-import { HOUR, MINUTE, systemClock } from './util.ts';
+import {  MINUTE, systemClock } from './util.ts';
 
 const config = loadConfig();
 const sites = loadSites(config.sitesFile, { allowDevOrigins: config.allowDevOrigins });
@@ -25,7 +25,7 @@ const server = serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' 
   console.log(`Comments service on http://localhost:${info.port} (${config.baseUrl})`);
   console.log(`Sites: ${[...sites.values()].map((s) => `${s.id} [${[...s.origins].join(', ')}]`).join('; ')}`);
   if (!google) console.log('Google sign-in is off (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set).');
-  if (!config.smtpUrl) console.log('SMTP_URL not set: mails are printed here.');
+  if (!config.smtpUrl) console.log(config.emailSignIn ? 'SMTP_URL not set: mails are printed here.' : 'SMTP_URL not set: email sign-in is off; admin notifications are printed here.');
   if (config.devMode) console.log('DEV_MODE: the popup offers a sign-in without any check.');
 });
 

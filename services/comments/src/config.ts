@@ -8,6 +8,8 @@ export interface Config {
   googleClientSecret?: string;
   /** nodemailer connection URL; without it, mails are printed to the log. */
   smtpUrl?: string;
+  /** Email-link sign-in is offered: with SMTP, or in development (links printed to the log). */
+  emailSignIn: boolean;
   mailFrom: string;
   databasePath: string;
   sitesFile: string;
@@ -32,6 +34,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     googleClientId: env.GOOGLE_CLIENT_ID || undefined,
     googleClientSecret: env.GOOGLE_CLIENT_SECRET || undefined,
     smtpUrl: env.SMTP_URL || undefined,
+    emailSignIn: !!env.SMTP_URL || !production,
     mailFrom: env.MAIL_FROM ?? 'Comments <comments@localhost>',
     databasePath: env.DATABASE_PATH ?? resolve('data/comments.db'),
     sitesFile: env.SITES_FILE ?? resolve(import.meta.dirname, '../sites.yaml'),
@@ -47,7 +50,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     if (!config.adminEmail) problems.push('ADMIN_EMAIL is required');
     if (config.allowDevOrigins) problems.push('ALLOW_DEV_ORIGINS is not allowed in production');
     if (config.devMode) problems.push('DEV_MODE is not allowed in production');
-    if (!config.smtpUrl) problems.push('SMTP_URL is required');
     if (problems.length) throw new Error(`Invalid configuration:\n- ${problems.join('\n- ')}`);
   }
   return config;

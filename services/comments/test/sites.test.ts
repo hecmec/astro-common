@@ -45,7 +45,11 @@ describe('config', () => {
     expect(loadConfig({ NODE_ENV: 'production', BASE_URL: 'https://c.example.org/', ADMIN_EMAIL: 'A@B.org', SMTP_URL: 'smtp://x' })).toMatchObject({
       baseUrl: 'https://c.example.org',
       adminEmail: 'a@b.org',
+      emailSignIn: true,
     });
+    // Without SMTP the service starts, with the email sign-in off
+    expect(loadConfig({ NODE_ENV: 'production', BASE_URL: 'https://c.example.org', ADMIN_EMAIL: 'a@b.org' })).toMatchObject({ emailSignIn: false });
+    expect(loadConfig({})).toMatchObject({ emailSignIn: true }); // development: links printed
   });
 });
 

@@ -119,6 +119,26 @@ describe('email link', () => {
   });
 });
 
+describe('without SMTP', () => {
+  it('hides and refuses the email sign-in', async () => {
+    const s = setup({ emailSignIn: false });
+    const { body } = await startFlow(s);
+    const popup = await (await s.app.request(`/auth/start?flow=${body!.flow}`)).text();
+    expect(popup).not.toContain('action="/auth/email"');
+    expect(popup).toContain('pas encore disponible');
+    expect((await s.form('/auth/email', { flow: body!.flow, email: 'ana@example.org' })).status).toBe(404);
+    expect(s.mailer.sent).toHaveLength(0);
+  });
+
+  it('still offers Google', async () => {
+    const s = setup({ emailSignIn: false, google: { sub: 'g1', email: 'ana@gmail.com', email_verified: true } });
+    const { body } = await startFlow(s);
+    const popup = await (await s.app.request(`/auth/start?flow=${body!.flow}`)).text();
+    expect(popup).toContain('/auth/google?flow=');
+    expect(popup).not.toContain('pas encore disponible');
+  });
+});
+
 describe('Google', () => {
   async function googleSignIn(s: ReturnType<typeof setup>) {
     const { body } = await startFlow(s);

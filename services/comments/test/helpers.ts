@@ -27,7 +27,7 @@ sites:
     bake_after_days: 3
 `;
 
-export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean } = {}) {
+export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean; emailSignIn?: boolean } = {}) {
   let time = Date.parse('2026-11-01T10:00:00Z');
   const now = () => time;
   const advance = (ms: number) => {
@@ -37,6 +37,7 @@ export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean 
     baseUrl: BASE,
     adminEmail: ADMIN,
     mailFrom: 'test@comments.test',
+    emailSignIn: opts.emailSignIn ?? true,
     databasePath: ':memory:',
     sitesFile: '',
     allowDevOrigins: false,

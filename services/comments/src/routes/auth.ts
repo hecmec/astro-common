@@ -94,7 +94,7 @@ export function authRoutes(deps: Deps, limits: Limits): Hono {
     if (!site || !site.origins.has(flow.origin)) {
       return c.html(messagePage(flow.lang, t(flow.lang, 'unknownOrigin'), t(flow.lang, 'unknownOrigin'), { error: true }), 403);
     }
-    return c.html(signInPage({ lang: flow.lang, siteName: site.name, flow: flowId!, google: !!deps.google, dev: config.devMode }));
+    return c.html(signInPage({ lang: flow.lang, siteName: site.name, flow: flowId!, google: !!deps.google, email: config.emailSignIn, dev: config.devMode }));
   });
 
   /** Lets the popup close itself once signed in (no token here). */
@@ -138,6 +138,7 @@ export function authRoutes(deps: Deps, limits: Limits): Hono {
   });
 
   app.post('/email', async (c) => {
+    if (!config.emailSignIn) return c.notFound();
     if (!sameOrigin(c.req.header('origin'))) return c.text('Forbidden', 403);
     const form = await c.req.parseBody();
     const flowId = String(form.flow ?? '');
@@ -148,7 +149,7 @@ export function authRoutes(deps: Deps, limits: Limits): Hono {
     }
     const site = sites.get(flow.site_id)!;
     const page = (extra: { error?: string; sent?: string }, status: 200 | 400 | 429 = 200) =>
-      c.html(signInPage({ lang: flow.lang, siteName: site.name, flow: flowId, google: !!deps.google, dev: config.devMode, ...extra }), status);
+      c.html(signInPage({ lang: flow.lang, siteName: site.name, flow: flowId, google: !!deps.google, email: config.emailSignIn, dev: config.devMode, ...extra }), status);
     if (!EMAIL_RE.test(email) || email.length > 320) return page({ error: t(flow.lang, 'invalidEmail') }, 400);
     const ip = await clientIp(c, config.trustProxy);
     if (!limits.flows.hit(`email-ip:${ip}`) || !limits.emails.hit(email)) return page({ error: t(flow.lang, 'tooMany') }, 429);

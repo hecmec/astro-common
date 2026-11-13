@@ -13,7 +13,7 @@ Readers of the BabelCoach sites sign in (Google or an email link), comment on a 
 | `BASE_URL` | Public URL, e.g. `https://comments.babelcoach.com` (https required in production) |
 | `ADMIN_EMAIL` | The admin's Google account; nobody else can open `/admin` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client (Web application). Redirect URI: `<BASE_URL>/auth/google/callback` |
-| `SMTP_URL` | nodemailer URL, e.g. `smtps://user:pass@smtp.example.org:465` (required in production; without it mails are printed) |
+| `SMTP_URL` | nodemailer URL, e.g. `smtps://user:pass@smtp.example.org:465` (without it: in production the email sign-in is off and admin notifications go to the log; in development mails are printed) |
 | `MAIL_FROM` | Sender, e.g. `Comments <comments@babelcoach.com>` |
 | `DATABASE_PATH` | SQLite file (Docker: `/data/comments.db`, on a persistent volume) |
 | `TRUST_PROXY` | `true` behind Coolify's proxy, so rate limits see the real client IP |

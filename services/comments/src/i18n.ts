@@ -25,6 +25,7 @@ const strings = {
     mailSubject: 'Your sign-in link for {site}',
     mailText:
       'Hello,\n\nTo sign in to comment on {site}, open this link within 15 minutes:\n\n{link}\n\nIf you did not ask for it, ignore this message: nothing happens without the link.\n',
+    noSignIn: 'Sign-in is not available yet. Please come back later.',
     privacy: 'By signing in, you agree that we store your email address and your comments. You can delete your account at any time.',
   },
   fr: {
@@ -50,6 +51,7 @@ const strings = {
     mailSubject: 'Votre lien de connexion pour {site}',
     mailText:
       'Bonjour,\n\nPour vous connecter et commenter sur {site}, ouvrez ce lien dans les 15 minutes :\n\n{link}\n\nSi vous ne l’avez pas demandé, ignorez ce message : rien ne se passe sans le lien.\n',
+    noSignIn: 'La connexion n’est pas encore disponible. Revenez plus tard.',
     privacy: 'En vous connectant, vous acceptez que nous conservions votre adresse e-mail et vos commentaires. Vous pouvez supprimer votre compte à tout moment.',
   },
   de: {
@@ -75,6 +77,7 @@ const strings = {
     mailSubject: 'Dein Anmeldelink für {site}',
     mailText:
       'Hallo,\n\num dich anzumelden und auf {site} zu kommentieren, öffne diesen Link innerhalb von 15 Minuten:\n\n{link}\n\nWenn du ihn nicht angefordert hast, ignoriere diese Nachricht: ohne den Link passiert nichts.\n',
+    noSignIn: 'Die Anmeldung ist noch nicht verfügbar. Bitte schau später wieder vorbei.',
     privacy: 'Mit der Anmeldung stimmst du zu, dass wir deine E-Mail-Adresse und deine Kommentare speichern. Du kannst dein Konto jederzeit löschen.',
   },
 } satisfies Record<Lang, Record<string, string>>;

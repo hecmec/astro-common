@@ -64,6 +64,7 @@ export function signInPage(p: {
   siteName: string;
   flow: string;
   google: boolean;
+  email: boolean;
   dev: boolean;
   error?: string;
   sent?: string;
@@ -87,13 +88,19 @@ export function signInPage(p: {
       <p>${t(lang, 'signInIntro')}</p>
       ${p.error ? html`<p class="notice error">${p.error}</p>` : ''}
       <div data-flow="${p.flow}"></div>
-      ${p.google ? html`<p><a class="btn" href="/auth/google?flow=${p.flow}">${t(lang, 'google')}</a></p><p class="or">${t(lang, 'or')}</p>` : ''}
-      <form method="post" action="/auth/email" class="stack">
-        <input type="hidden" name="flow" value="${p.flow}">
-        <div><label for="email">${t(lang, 'emailLabel')}</label>
-        <input id="email" name="email" type="email" autocomplete="email" required maxlength="320"></div>
-        <button class="btn secondary" type="submit">${t(lang, 'emailButton')}</button>
-      </form>
+      ${p.google ? html`<p><a class="btn" href="/auth/google?flow=${p.flow}">${t(lang, 'google')}</a></p>` : ''}
+      ${p.google && p.email ? html`<p class="or">${t(lang, 'or')}</p>` : ''}
+      ${
+        p.email
+          ? html`<form method="post" action="/auth/email" class="stack">
+              <input type="hidden" name="flow" value="${p.flow}">
+              <div><label for="email">${t(lang, 'emailLabel')}</label>
+              <input id="email" name="email" type="email" autocomplete="email" required maxlength="320"></div>
+              <button class="btn secondary" type="submit">${t(lang, 'emailButton')}</button>
+            </form>`
+          : ''
+      }
+      ${!p.google && !p.email && !p.dev ? html`<p class="notice">${t(lang, 'noSignIn')}</p>` : ''}
       ${
         p.dev
           ? html`<form method="post" action="/auth/dev" class="stack">

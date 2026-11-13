@@ -23,6 +23,7 @@ const config: Config = {
   baseUrl: SERVICE,
   adminEmail: 'admin@example.org',
   mailFrom: 'test@localhost',
+  emailSignIn: true,
   databasePath: ':memory:',
   sitesFile: '',
   allowDevOrigins: true,
