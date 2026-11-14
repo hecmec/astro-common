@@ -17,8 +17,14 @@ Readers of the BabelCoach sites sign in (Google or an email link), comment on a 
 | `MAIL_FROM` | Sender, e.g. `Comments <comments@babelcoach.com>` |
 | `DATABASE_PATH` | SQLite file (Docker: `/data/comments.db`, on a persistent volume) |
 | `TRUST_PROXY` | `true` behind Coolify's proxy, so rate limits see the real client IP |
+| `COOLIFY_API_URL`, `COOLIFY_DEPLOY_TOKEN` | Nightly rebuild of the sites (below): Coolify's URL (`https://coolify.babelcoach.com`) and a token allowed to deploy the sites' production apps. Without them the rebuild is off |
+| `REBUILD_AT` | Local time of the nightly rebuild check, Europe/Paris, `HH:MM` (default `03:30`) |
 | `PORT` | Default 4330 |
 | `ALLOW_DEV_ORIGINS`, `DEV_MODE` | Development only (refused when `NODE_ENV=production`): accept `dev_origins` from `sites.yaml`; offer a sign-in without any check |
+
+## Nightly rebuild of the sites
+
+Comments enter a site's HTML only when the site is built. Every night at `REBUILD_AT` (Europe/Paris), the service computes each site's export and compares its fingerprint (comments, authors, texts, replies, reaction counts; not the dates) with the one of the last rebuild it requested. When it differs, it asks Coolify to deploy the site's production app (`rebuild.coolify_app` in `sites.yaml`, `POST /api/v1/deploy`). Unchanged sites are not rebuilt; a failed request is retried the next night. The admin page shows each site's last check and has a "Rebuild changed sites now" button, for example after unpublishing an old comment.
 
 ## Run locally
 

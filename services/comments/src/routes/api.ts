@@ -1,5 +1,6 @@
 import { type Context, Hono } from 'hono';
 import { type Deps, bearer } from '../context.ts';
+import { buildExport } from '../export.ts';
 import { type Lang, type Site, pickLang } from '../sites.ts';
 import {
   type CommentRow,
@@ -176,26 +177,8 @@ export function apiRoutes(deps: Deps): Hono<Env> {
 
   /** Published comments older than the site's delay, for static site builds. */
   app.get('/sites/:site/export', (c) => {
-    const site = c.get('site');
-    const cutoff = now() - site.bakeAfterDays * DAY;
-    const pages: Record<string, { comments: ReturnType<typeof publicComment>[]; reactions: Record<string, number> }> = {};
-    const page = (path: string) => (pages[path] ??= { comments: [], reactions: {} });
-    for (const row of exportComments(db, site.id, cutoff)) {
-      const { status: _s, mine: _m, ...rest } = publicComment(row, null);
-      page(row.path).comments.push(rest as ReturnType<typeof publicComment>);
-    }
-    for (const r of allReactionCounts(db, site.id)) {
-      if (site.reactions.some((k) => k.id === r.kind)) page(r.path).reactions[r.kind] = r.n;
-    }
     c.header('cache-control', 'public, max-age=600');
-    return c.json({
-      site: site.id,
-      name: site.name,
-      cutoff: iso(cutoff),
-      generated_at: iso(now()),
-      reactions: site.reactions,
-      pages,
-    });
+    return c.json(buildExport(db, c.get('site'), now()));
   });
 
   return app;

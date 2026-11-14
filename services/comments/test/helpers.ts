@@ -43,6 +43,7 @@ export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean;
     allowDevOrigins: false,
     devMode: opts.devMode ?? false,
     trustProxy: true,
+    rebuildAt: '03:30',
     port: 0,
     production: false,
   };

@@ -3,6 +3,7 @@ import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { GoogleProvider } from './google.ts';
 import type { Mailer } from './mailer.ts';
+import type { Rebuilder } from './rebuild.ts';
 import { RateLimiter } from './ratelimit.ts';
 import type { Sites } from './sites.ts';
 import { type Clock, MINUTE } from './util.ts';
@@ -16,6 +17,8 @@ export interface Deps {
   now: Clock;
   /** Called after a comment is posted (wakes the admin notifier). */
   onNewComment?: () => void;
+  /** Nightly rebuild of the sites' production apps; absent when not configured. */
+  rebuilder?: Rebuilder;
 }
 
 export interface Limits {

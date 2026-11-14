@@ -19,6 +19,11 @@ export interface Config {
   devMode: boolean;
   /** Read the client IP from X-Forwarded-For (behind Coolify's proxy). */
   trustProxy: boolean;
+  /** Coolify API for the nightly rebuild of the sites; both needed, else the rebuild is off. */
+  coolifyApiUrl?: string;
+  coolifyDeployToken?: string;
+  /** Local time (Europe/Paris) of the nightly rebuild check, HH:MM. */
+  rebuildAt: string;
   port: number;
   production: boolean;
 }
@@ -41,9 +46,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     allowDevOrigins: bool(env.ALLOW_DEV_ORIGINS),
     devMode: bool(env.DEV_MODE),
     trustProxy: bool(env.TRUST_PROXY),
+    coolifyApiUrl: env.COOLIFY_API_URL ? env.COOLIFY_API_URL.replace(/\/+$/, '') : undefined,
+    coolifyDeployToken: env.COOLIFY_DEPLOY_TOKEN || undefined,
+    rebuildAt: env.REBUILD_AT ?? '03:30',
     port,
     production,
   };
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(config.rebuildAt)) throw new Error(`Invalid configuration:\n- REBUILD_AT must be HH:MM, got ${config.rebuildAt}`);
   if (production) {
     const problems: string[] = [];
     if (!config.baseUrl.startsWith('https://')) problems.push('BASE_URL must be an https URL');

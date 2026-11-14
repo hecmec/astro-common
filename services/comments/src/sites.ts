@@ -21,6 +21,8 @@ const siteSchema = z.object({
     .array(z.object({ id: z.string().regex(/^[a-z0-9-]{1,30}$/), icon: z.string().min(1).max(8), label }))
     .max(8)
     .default([]),
+  /** Production app on Coolify, rebuilt at night when the export changed. */
+  rebuild: z.object({ coolify_app: z.string().regex(/^[a-z0-9]{10,40}$/) }).optional(),
 });
 
 const fileSchema = z.object({
@@ -42,6 +44,8 @@ export interface Site {
   languages: Lang[];
   bakeAfterDays: number;
   reactions: Reaction[];
+  /** Coolify uuid of the production app to rebuild, if any. */
+  rebuildApp?: string;
 }
 
 export type Sites = Map<string, Site>;
@@ -75,6 +79,7 @@ export function parseSites(text: string, opts: { allowDevOrigins: boolean }): Si
       languages: s.languages,
       bakeAfterDays: s.bake_after_days,
       reactions: s.reactions,
+      rebuildApp: s.rebuild?.coolify_app,
     });
   }
   return sites;

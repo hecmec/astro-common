@@ -29,6 +29,7 @@ const config: Config = {
   allowDevOrigins: true,
   devMode: true,
   trustProxy: false,
+  rebuildAt: '03:30',
   port: 4398,
   production: false,
 };

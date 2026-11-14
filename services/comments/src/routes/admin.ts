@@ -73,6 +73,26 @@ export function adminRoutes(deps: Deps): Hono<Env> {
     return c.redirect(ref?.startsWith(`${config.baseUrl}/admin`) ? ref : '/admin');
   };
 
+  const rebuildBox = () => {
+    const r = deps.rebuilder;
+    if (!r) return html`<section class="card muted"><strong>Site rebuilds</strong>: off (COOLIFY_API_URL / COOLIFY_DEPLOY_TOKEN not set).</section>`;
+    return html`<section class="card">
+      <div class="row" style="justify-content: space-between">
+        <strong>Site rebuilds</strong>
+        <form method="post" action="/admin/rebuild"><button class="btn small secondary">Rebuild changed sites now</button></form>
+      </div>
+      <p class="muted">Every night at ${config.rebuildAt} (Europe/Paris), sites whose baked comments or reactions changed are rebuilt.</p>
+      <ul>
+        ${r.configuredSites().map((s) => {
+          const st = r.status(s.id);
+          const when = st ? st.checked_at.slice(0, 16).replace('T', ' ') + ' UTC' : 'never checked';
+          const what = !st ? '' : st.result === 'requested' ? 'rebuild requested' : st.result === 'unchanged' ? 'unchanged, no rebuild' : `failed: ${st.error}`;
+          return html`<li>${s.name}: ${when}${what ? html` · ${what}` : ''}</li>`;
+        })}
+      </ul>
+    </section>`;
+  };
+
   app.get('/', (c) => {
     const status = (STATUSES.find((s) => s === c.req.query('status')) ?? 'pending') as Status;
     const siteId = sites.has(c.req.query('site') ?? '') ? c.req.query('site') : undefined;
@@ -149,7 +169,8 @@ export function adminRoutes(deps: Deps): Hono<Env> {
                   : ''
               }
             </article>`,
-          )}`,
+          )}
+          ${rebuildBox()}`,
       }),
     );
   });
@@ -180,6 +201,11 @@ export function adminRoutes(deps: Deps): Hono<Env> {
 
   app.post('/users/:id/:action{block|unblock}', (c) => {
     setBlocked(db, Number(c.req.param('id')), c.req.param('action') === 'block', now());
+    return back(c);
+  });
+
+  app.post('/rebuild', async (c) => {
+    if (deps.rebuilder) await deps.rebuilder.runAll();
     return back(c);
   });
 

@@ -11,6 +11,9 @@
 # `bake_after_days`: published comments older than this are written into the
 # site's static HTML by its build (export endpoint).
 #
+# `rebuild.coolify_app`: the site's production app on Coolify, rebuilt at night when
+# its baked comments changed (needs COOLIFY_API_URL and COOLIFY_DEPLOY_TOKEN).
+#
 # `reactions`: one-click reactions shown under each page (at most 8).
 # The labels below are placeholders to review.
 
@@ -18,9 +21,10 @@ sites:
   alt-web:
     name: Alt Web
     domains: [www.alt-web.org, alt-web.org, alt-web-staging.babelcoach.com]
-    dev_origins: [http://localhost:4325, http://localhost:4399]
+    dev_origins: [http://localhost:4325, http://localhost:4399, http://localhost:4396]
     languages: [en, fr, de]
     bake_after_days: 7
+    rebuild: { coolify_app: wig1jycbj6pmcmzlvhmoi5mv }   # production app on Coolify
     reactions:
       - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
       - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
@@ -29,9 +33,10 @@ sites:
   simplygoodfood:
     name: Simply Good Food
     domains: [www.simplygoodfood.eu, simplygoodfood.eu, simplygoodfood-staging.babelcoach.com]
-    dev_origins: [http://localhost:4321]
+    dev_origins: [http://localhost:4321, http://localhost:4399]
     languages: [en, fr, de]
     bake_after_days: 7
+    rebuild: { coolify_app: g6yp37pejztcj1nkupudcfrd }   # production app on Coolify
     reactions:
       - { id: yummy, icon: "😋", label: { en: Looks good, fr: Appétissant, de: Lecker } }
       - { id: nice, icon: "👍", label: { en: Nice, fr: Bien, de: Gut } }
@@ -40,9 +45,10 @@ sites:
   anglais-gratuit:
     name: Anglais gratuit
     domains: [www.anglais-gratuit.org, anglais-gratuit.org, anglais-gratuit-staging.babelcoach.com]
-    dev_origins: [http://localhost:4326]
+    dev_origins: [http://localhost:4326, http://localhost:4399]
     languages: [fr]
     bake_after_days: 7
+    rebuild: { coolify_app: uy8bfmt4xstzlhc3r1shjaxc }   # production app on Coolify
     reactions:
       - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
       - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
@@ -51,9 +57,10 @@ sites:
   bonetgratuit:
     name: Bon et gratuit
     domains: [www.bon-et-gratuit.fr, bon-et-gratuit.fr, bon-et-gratuit-staging.babelcoach.com]
-    dev_origins: [http://localhost:4327]
+    dev_origins: [http://localhost:4321, http://localhost:4399]
     languages: [fr]
     bake_after_days: 7
+    rebuild: { coolify_app: 6zdj4wvwxth2t2soytgxjn5q }   # production app on Coolify
     reactions:
       - { id: useful, icon: "👍", label: { en: Useful, fr: Utile, de: Hilfreich } }
       - { id: tried, icon: "✅", label: { en: I use it, fr: Je l’utilise, de: Nutze ich } }
