@@ -17,4 +17,4 @@
 
 ## 4. Deployment
 
-- [ ] 4.1 Set `COOLIFY_API_URL` and `COOLIFY_DEPLOY_TOKEN` on the comments app and redeploy; verify the startup log says the nightly rebuild is on and the admin box shows the sites
+- [x] 4.1 Set `COOLIFY_API_URL` and `COOLIFY_DEPLOY_TOKEN` on the comments app and redeploy; verify the startup log says the nightly rebuild is on and the admin box shows the sites
