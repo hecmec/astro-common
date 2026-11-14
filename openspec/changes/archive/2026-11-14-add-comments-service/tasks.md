@@ -2,7 +2,7 @@
 
 - [x] 1.1 Create the pnpm workspace (root `package.json` with `packageManager` pnpm 12, `pnpm-workspace.yaml` with `minimumReleaseAge: 10080` and esbuild as the only allowed build, `tsconfig.base.json` for type stripping, `.gitignore`, `.nvmrc` 26, `readme.md`) with `services/comments`, `packages/comments-widget`, `packages/astro-comments`; verify `pnpm install --frozen-lockfile` succeeds and installs no version younger than 7 days
 - [x] 1.2 Add Vitest and root `pnpm test` / `pnpm check` running all packages; verify both pass
-- [ ] 1.3 Create the GitHub repo `hecmec/astro-common` (public) and push; verify it is reachable without authentication
+- [x] 1.3 Create the GitHub repo `hecmec/astro-common` (public) and push; verify it is reachable without authentication
 
 ## 2. Service foundation
 
@@ -56,7 +56,7 @@
 ## 8. Deployment
 
 - [x] 8.1 Dockerfile for the service (Node 26 alpine, pnpm frozen lockfile, widget built, prod dependencies only, non-root, database on `/data`) and a backup script using `VACUUM INTO`; verify `docker build` and `docker run` serve `/healthz` and `/widget.js`
-- [ ] 8.2 Coolify application, domain `comments.babelcoach.com`, runtime variables, persistent volume; verify `/healthz` over HTTPS
+- [x] 8.2 Coolify application, domain `astro-common-comments.babelcoach.com`, runtime variables, persistent volume; verify `/healthz` over HTTPS
 - [ ] 8.3 Google OAuth client with the production and local redirect URIs; SMTP sender with SPF/DKIM/DMARC; verify a real Google sign-in and a magic link received in a Gmail inbox, not spam
 - [ ] 8.4 Nightly backup copied off the server, restore steps in the service README; verify by restoring a backup into a local instance
 - [ ] 8.5 End-to-end check on alternative-web staging (in a separate alternative-web change): post, moderate, see it live, then see it baked after a build with `bake_after_days` temporarily at 0
