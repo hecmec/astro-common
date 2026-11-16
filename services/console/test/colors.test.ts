@@ -3,25 +3,27 @@ import { SURFACES, contrast, deltaE } from '../src/lib/colors.ts';
 import { sites } from './helpers.ts';
 
 /**
- * The site colours (spec admin-console, "The four sites"): distinguishable for common
- * colour-vision deficiencies and readable on both themes. Thresholds of the dataviz
- * palette method: OKLab ΔE×100 >= 8 under protan/deutan simulation and >= 15 in normal
- * vision for neighbouring entries, tritan reported; contrast >= 3:1 on the surface, or
- * >= 2:1 with relief (the chart's direct end labels, legend and table view).
+ * The site colours (spec admin-console, "The four sites"): in each theme, every pair is
+ * distinguishable (chart lines cross, so any two colours can meet) and every colour is
+ * readable. Thresholds of the dataviz palette method: OKLab ΔE×100 >= 15 in normal vision
+ * and >= 8 under protan, deutan and tritan simulation; contrast >= 3:1 on the surface, or
+ * >= 2:1 with relief (the chart's direct end labels, totals legend and table view).
  */
 const modes = ['light', 'dark'] as const;
-const pairs = sites.slice(1).map((s, i) => [sites[i]!, s] as const);
+const pairs = sites.flatMap((a, i) => sites.slice(i + 1).map((b) => [a, b] as const));
 
 describe('site colours', () => {
   it('reproduce the reference values of the formulas', () => {
     expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);
     expect(deltaE('#2a78d6', '#2a78d6')).toBe(0);
-    // validator report: #eda100 vs #1baf7a, worst adjacent protan ΔE 9.1
-    expect(deltaE('#eda100', '#1baf7a', 'protan')).toBeCloseTo(9.1, 1);
+    // validator reports (all pairs): light lemon/green protan ΔE 15.9, dark bordeaux/green deutan 8.5
+    expect(deltaE('#6c8a26', '#ccb501', 'protan')).toBeCloseTo(15.9, 1);
+    expect(deltaE('#aa4964', '#227702', 'deutan')).toBeCloseTo(8.5, 1);
+    expect(pairs).toHaveLength(6);
   });
 
   for (const mode of modes) {
-    it(`are distinguishable under simulated colour-vision deficiencies (${mode})`, () => {
+    it(`are distinguishable for every pair, also with colour-vision deficiencies (${mode})`, () => {
       for (const [a, b] of pairs) {
         const [x, y] = [a.color[mode], b.color[mode]];
         expect(deltaE(x, y, 'normal'), `${a.id}/${b.id} normal`).toBeGreaterThanOrEqual(15);

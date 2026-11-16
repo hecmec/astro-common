@@ -1,9 +1,11 @@
 # Sites shown in the console. Ids must be exactly those of services/comments/sites.yaml
 # (a test checks it). Changing this file needs a rebuild of the console (it is bundled).
 #
-# `color`: the site's colour in every chart and badge, one step per theme. The four are
-# slots 1-4 of a categorical palette validated for colour-vision deficiencies; keep this
-# order (adjacent entries are the pairs checked) and run the console tests after a change.
+# `color`: the site's colour in every chart and badge, one step per theme: lemon (AG),
+# broccoli green (SGF), bordeaux (AW), blue (BG). The steps were searched so that, in each
+# theme, every pair stays distinguishable, also for colour-blind readers, and each colour is
+# readable on the background (openspec change change-site-colours). test/colors.test.ts
+# checks it: run the console tests after changing a colour.
 # `umami`: the Umami website id (stats.babelcoach.com).
 # `search_console`: the Search Console property (used by a later change).
 
@@ -12,7 +14,7 @@ sites:
     name: Anglais gratuit
     short: AG
     domain: www.anglais-gratuit.org
-    color: { light: "#2a78d6", dark: "#3987e5" }
+    color: { light: "#ccb501", dark: "#d8c22c" }   # lemon
     umami: e758235d-249c-42fb-829e-8a8c9ffc09a0
     search_console: sc-domain:anglais-gratuit.org
 
@@ -20,7 +22,7 @@ sites:
     name: Simply Good Food
     short: SGF
     domain: www.simplygoodfood.eu
-    color: { light: "#eb6834", dark: "#d95926" }
+    color: { light: "#6c8a26", dark: "#227702" }   # broccoli green
     umami: ff436440-cb62-48ea-a15a-780d6a61e9c3
     search_console: sc-domain:simplygoodfood.eu
 
@@ -28,7 +30,7 @@ sites:
     name: Alt Web
     short: AW
     domain: www.alt-web.org
-    color: { light: "#1baf7a", dark: "#199e70" }
+    color: { light: "#92123b", dark: "#aa4964" }   # bordeaux
     umami: c75ecd49-004b-4d68-a67a-f72d5d5d367d
     search_console: sc-domain:alt-web.org
 
@@ -36,6 +38,6 @@ sites:
     name: Bon et gratuit
     short: BG
     domain: www.bon-et-gratuit.fr
-    color: { light: "#eda100", dark: "#c98500" }
+    color: { light: "#2a78d6", dark: "#3987e5" }   # blue
     umami: e1100d32-1ea8-418b-81b7-f38a9612b5f5
     search_console: sc-domain:bon-et-gratuit.fr
