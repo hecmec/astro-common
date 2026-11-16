@@ -12,5 +12,5 @@
 
 ## 3. Release
 
-- [ ] 3.1 Commit on `develop`, then (when asked) fast-forward `main` and push; verify the Coolify deployment of `console` finishes healthy and https://console.babelcoach.com/visits shows the new colours
-- [ ] 3.2 After the switch from lemon to lime: release again and verify the live chart shows the lime of Anglais gratuit
+- [x] 3.1 Commit on `develop`, then (when asked) fast-forward `main` and push; verify the Coolify deployment of `console` finishes healthy and https://console.babelcoach.com/visits shows the new colours
+- [x] 3.2 After the switch from lemon to lime: release again and verify the live chart shows the lime of Anglais gratuit
