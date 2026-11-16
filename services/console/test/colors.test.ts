@@ -16,9 +16,9 @@ describe('site colours', () => {
   it('reproduce the reference values of the formulas', () => {
     expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);
     expect(deltaE('#2a78d6', '#2a78d6')).toBe(0);
-    // validator reports (all pairs): light lemon/green protan ΔE 15.9, dark bordeaux/green deutan 8.5
-    expect(deltaE('#6c8a26', '#ccb501', 'protan')).toBeCloseTo(15.9, 1);
-    expect(deltaE('#aa4964', '#227702', 'deutan')).toBeCloseTo(8.5, 1);
+    // validator reports (all pairs): light bordeaux/green deutan ΔE 10.3, dark bordeaux/green deutan 8.6
+    expect(deltaE('#92123b', '#487c25', 'deutan')).toBeCloseTo(10.3, 1);
+    expect(deltaE('#aa4964', '#478809', 'deutan')).toBeCloseTo(8.6, 1);
     expect(pairs).toHaveLength(6);
   });
 

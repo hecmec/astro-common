@@ -1,7 +1,7 @@
 # Sites shown in the console. Ids must be exactly those of services/comments/sites.yaml
 # (a test checks it). Changing this file needs a rebuild of the console (it is bundled).
 #
-# `color`: the site's colour in every chart and badge, one step per theme: lemon (AG),
+# `color`: the site's colour in every chart and badge, one step per theme: lime (AG),
 # broccoli green (SGF), bordeaux (AW), blue (BG). The steps were searched so that, in each
 # theme, every pair stays distinguishable, also for colour-blind readers, and each colour is
 # readable on the background (openspec change change-site-colours). test/colors.test.ts
@@ -14,7 +14,7 @@ sites:
     name: Anglais gratuit
     short: AG
     domain: www.anglais-gratuit.org
-    color: { light: "#ccb501", dark: "#d8c22c" }   # lemon
+    color: { light: "#a2bc32", dark: "#c8e100" }   # lime (dark: the site's own button lime)
     umami: e758235d-249c-42fb-829e-8a8c9ffc09a0
     search_console: sc-domain:anglais-gratuit.org
 
@@ -22,7 +22,7 @@ sites:
     name: Simply Good Food
     short: SGF
     domain: www.simplygoodfood.eu
-    color: { light: "#6c8a26", dark: "#227702" }   # broccoli green
+    color: { light: "#487c25", dark: "#478809" }   # broccoli green
     umami: ff436440-cb62-48ea-a15a-780d6a61e9c3
     search_console: sc-domain:simplygoodfood.eu
 

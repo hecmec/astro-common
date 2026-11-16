@@ -1,6 +1,6 @@
 ## Why
 
-The console's site colours were picked from a generic palette (blue, orange, aqua, yellow) and say nothing about the sites. Colours that recall each site are easier to remember: lemon for Anglais gratuit, broccoli green for Simply Good Food, bordeaux red for Alt Web, blue for Bon et gratuit. The current set also lets two colours get confused where lines cross (orange and yellow for colour-blind readers in dark mode), which the new set must avoid.
+The console's site colours were picked from a generic palette (blue, orange, aqua, yellow) and say nothing about the sites. Colours that recall each site are easier to remember: lime for Anglais gratuit (the lime of its buttons), broccoli green for Simply Good Food, bordeaux red for Alt Web, blue for Bon et gratuit. The current set also lets two colours get confused where lines cross (orange and yellow for colour-blind readers in dark mode), which the new set must avoid.
 
 ## What Changes
 
@@ -8,8 +8,8 @@ The console's site colours were picked from a generic palette (blue, orange, aqu
 
   | Site | Light | Dark |
   | --- | --- | --- |
-  | Anglais gratuit | lemon `#ccb501` | bright lemon `#d8c22c` |
-  | Simply Good Food | broccoli green `#6c8a26` | broccoli green `#227702` |
+  | Anglais gratuit | lime `#a2bc32` | the site's own lime `#c8e100` |
+  | Simply Good Food | broccoli green `#487c25` | broccoli green `#478809` |
   | Alt Web | bordeaux `#92123b` | bordeaux, lightened for the dark page, `#aa4964` |
   | Bon et gratuit | blue `#2a78d6` (the current blue) | blue `#3987e5` |
 
