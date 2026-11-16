@@ -43,7 +43,7 @@ The console SHALL refuse any state-changing request that does not come from one 
 - **THEN** the console refuses it with 403 and changes nothing
 
 ### Requirement: Feature menu
-Every console page SHALL show a left menu with the console's features (Comments, Visits and Search), the signed-in account and a sign-out button. The Comments entry SHALL show the number of pending comments of all sites, and no number when there are none. On narrow screens the menu SHALL fold behind a button.
+Every console page SHALL show a left menu with the console's features (Comments, Visits, Search and Links), the signed-in account and a sign-out button. The Comments entry SHALL show the number of pending comments of all sites, and no number when there are none. On narrow screens the menu SHALL fold behind a button.
 
 #### Scenario: Pending comments
 - **WHEN** four comments are pending across the sites
@@ -56,6 +56,17 @@ Every console page SHALL show a left menu with the console's features (Comments,
 #### Scenario: Search in the menu
 - **WHEN** the admin opens any console page
 - **THEN** the menu offers Search after Visits, marked as the current page on the Search page
+
+### Requirement: Links to the sites
+The console SHALL have a Links page with two columns, staging and production, each listing the four sites with a link that opens in a new tab. Each column SHALL offer a button that opens its four sites in new tabs; when the browser blocks some of them, the page SHALL say how many and that pop-ups must be allowed for the console. Without JavaScript the links SHALL still work and the button SHALL not be shown.
+
+#### Scenario: Open all staging sites
+- **WHEN** the admin clicks "Open all 4" in the staging column and the browser allows pop-ups for the console
+- **THEN** the four staging sites open in four new tabs
+
+#### Scenario: Pop-ups blocked
+- **WHEN** the browser blocks three of the four tabs
+- **THEN** the page says that 3 of 4 tabs were blocked and that pop-ups must be allowed for the console
 
 ### Requirement: The four sites
 The console SHALL know the same sites as the comments service, each with a name, a colour and its public address. Each site SHALL keep its colour everywhere the console shows it (badges, chart lines, totals). Each site SHALL have a colour for the light theme and one for the dark theme: lime for Anglais gratuit, broccoli green for Simply Good Food, bordeaux red for Alt Web and blue for Bon et gratuit. In each theme, every pair of site colours SHALL be distinguishable for people with common colour-vision deficiencies (protanopia, deuteranopia, tritanopia) and with normal vision, and every colour SHALL be readable on the console's background: at least 3:1 contrast, or at least 2:1 where the site's name is also shown next to its line and in the totals.

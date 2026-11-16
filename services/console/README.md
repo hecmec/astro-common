@@ -7,6 +7,7 @@ The BabelCoach admins run the four sites from here: Alt Web, Simply Good Food, A
 | `/comments` | Moderation of the four sites: status tabs with counts, filters by site (`?site=alt-web`) and page (`?path=/x/`), publish, refuse/unpublish, sticky, public reply, block a reader; the site rebuild status and "Rebuild changed sites now". Every action is a plain form post and comes back to the same tab and filters |
 | `/visits` | One chart with the four sites' daily visitors or pageviews over 7, 30 or 90 days (`?range=90&metric=pageviews`), from Umami; totals per site; a table view |
 | `/search` | Google Search clicks or impressions of the four sites in one chart over 7, 30 or 90 days ending on Search Console's latest published day (`?range=7&metric=impressions`), totals, a table view, and the top 25 searches of all sites or one (`?site=alt-web`) |
+| `/links` | The four sites on staging and in production, two columns, each link in a new tab; an "Open all 4" button per environment opens the four sites in new tabs (browsers block all but the first tab until pop-ups are allowed for the console; the page says so) |
 | `/healthz` | Health check, no sign-in |
 
 The left menu shows the number of pending comments. Everything works without JavaScript; `/chart.js` only adds a crosshair tooltip to the chart.
@@ -21,7 +22,7 @@ The left menu shows the number of pending comments. Everything works without Jav
 
 ## Sites and colours
 
-[`sites.yaml`](sites.yaml) lists each site's name, abbreviation, domain, Umami website id, Search Console property (for a later change) and colour. A test checks that its ids are exactly those of [`../comments/sites.yaml`](../comments/sites.yaml). The file is bundled into the build, so a change needs a redeploy.
+[`sites.yaml`](sites.yaml) lists each site's name, abbreviation, production and staging hosts, Umami website id, Search Console property (for a later change) and colour. A test checks that its ids are exactly those of [`../comments/sites.yaml`](../comments/sites.yaml). The file is bundled into the build, so a change needs a redeploy.
 
 Each site has a colour that recalls it, with a light and a dark step: lime for Anglais gratuit (`#a2bc32` / `#c8e100`, the dark step is the lime of the site's buttons), broccoli green for Simply Good Food (`#487c25` / `#478809`), bordeaux for Alt Web (`#92123b` / `#aa4964`, lightened to stay readable on the dark page) and blue for Bon et gratuit (`#2a78d6` / `#3987e5`). Chart lines cross, so `test/colors.test.ts` checks every pair in each theme: OKLab ΔE ≥ 15 in normal vision and ≥ 8 under protan, deutan and tritan simulation, and contrast ≥ 3:1 on the dark surface, ≥ 2:1 on the light one (the light lime sits at 2.09:1; the chart's end labels, totals legend and table view carry the identity). The dark lime is brighter than the palette method's lightness band, by choice: it is the site's own colour. How the steps were searched: `openspec/changes/archive/*-change-site-colours/design.md`. Run the tests after changing a colour. Text never takes a site colour: the coloured dot beside it carries the identity.
 

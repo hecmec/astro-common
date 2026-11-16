@@ -6,7 +6,7 @@ import { getContext } from '../lib/context.ts';
 
 interface Props {
   title: string;
-  current: 'comments' | 'visits' | 'search';
+  current: 'comments' | 'visits' | 'search' | 'links';
   /** Pending comments of all sites, when the page already has them; else fetched here. */
   pending?: number | null;
 }
@@ -32,6 +32,7 @@ const menu = [
   { id: 'comments', href: '/comments', label: 'Comments', count: pending },
   { id: 'visits', href: '/visits', label: 'Visits', count: null },
   { id: 'search', href: '/search', label: 'Search', count: null },
+  { id: 'links', href: '/links', label: 'Links', count: null },
 ] as const;
 ---
 

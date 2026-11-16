@@ -6,6 +6,7 @@
 # theme, every pair stays distinguishable, also for colour-blind readers, and each colour is
 # readable on the background (openspec change change-site-colours). test/colors.test.ts
 # checks it: run the console tests after changing a colour.
+# `domain` / `staging`: the production and staging hosts (Links page).
 # `umami`: the Umami website id (stats.babelcoach.com).
 # `search_console`: the Search Console property (used by a later change).
 
@@ -14,6 +15,7 @@ sites:
     name: Anglais gratuit
     short: AG
     domain: www.anglais-gratuit.org
+    staging: anglais-gratuit-staging.babelcoach.com
     color: { light: "#a2bc32", dark: "#c8e100" }   # lime (dark: the site's own button lime)
     umami: e758235d-249c-42fb-829e-8a8c9ffc09a0
     search_console: sc-domain:anglais-gratuit.org
@@ -22,6 +24,7 @@ sites:
     name: Simply Good Food
     short: SGF
     domain: www.simplygoodfood.eu
+    staging: simplygoodfood-staging.babelcoach.com
     color: { light: "#487c25", dark: "#478809" }   # broccoli green
     umami: ff436440-cb62-48ea-a15a-780d6a61e9c3
     search_console: sc-domain:simplygoodfood.eu
@@ -30,6 +33,7 @@ sites:
     name: Alt Web
     short: AW
     domain: www.alt-web.org
+    staging: alt-web-staging.babelcoach.com
     color: { light: "#92123b", dark: "#aa4964" }   # bordeaux
     umami: c75ecd49-004b-4d68-a67a-f72d5d5d367d
     search_console: sc-domain:alt-web.org
@@ -38,6 +42,7 @@ sites:
     name: Bon et gratuit
     short: BG
     domain: www.bon-et-gratuit.fr
+    staging: bon-et-gratuit-staging.babelcoach.com
     color: { light: "#2a78d6", dark: "#3987e5" }   # blue
     umami: e1100d32-1ea8-418b-81b7-f38a9612b5f5
     search_console: sc-domain:bon-et-gratuit.fr

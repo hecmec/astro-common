@@ -19,7 +19,16 @@ describe('console sites', () => {
       expect(s.umamiId).toMatch(/^[0-9a-f-]{36}$/);
       expect(s.searchConsole).toMatch(/^sc-domain:/);
     }
-    expect(sites.find((s) => s.id === 'alt-web')).toMatchObject({ domain: 'www.alt-web.org', umamiId: 'c75ecd49-004b-4d68-a67a-f72d5d5d367d' });
+    expect(sites.find((s) => s.id === 'alt-web')).toMatchObject({ domain: 'www.alt-web.org', staging: 'alt-web-staging.babelcoach.com', umamiId: 'c75ecd49-004b-4d68-a67a-f72d5d5d367d' });
+  });
+
+  it('have production and staging hosts that the comments service allows', () => {
+    const comments = parse(readFileSync(resolve(import.meta.dirname, '../../comments/sites.yaml'), 'utf8')) as { sites: Record<string, { domains: string[] }> };
+    for (const s of sites) {
+      expect(comments.sites[s.id]!.domains, s.id).toContain(s.domain);
+      expect(comments.sites[s.id]!.domains, s.id).toContain(s.staging);
+      expect(s.staging).toMatch(/-staging\.babelcoach\.com$/);
+    }
   });
 
   it('reject an invalid file with every problem', () => {

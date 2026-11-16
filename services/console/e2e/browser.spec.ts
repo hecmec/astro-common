@@ -91,3 +91,37 @@ test('Search works with JavaScript disabled: range, metric and site', async ({ b
   await expect(page.locator('[data-top-row]')).toHaveCount(2);
   await context.close();
 });
+
+test('"Open all 4" opens the four sites of the environment in new tabs', async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await signInThroughPage(page);
+  await page.goto(`${A}/links`);
+  // Don't load the real sites: answer every request to them with an empty page.
+  await context.route(/https:\/\/[^/]*(babelcoach\.com|alt-web\.org|simplygoodfood\.eu|anglais-gratuit\.org|bon-et-gratuit\.fr)\//, (route) =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<title>site</title>' }),
+  );
+  const staging = page.locator('[data-env="staging"]');
+  const opened: string[] = [];
+  context.on('page', (p) => opened.push(p.url()));
+  await staging.getByRole('button', { name: 'Open all 4' }).click();
+  await expect.poll(() => context.pages().length).toBe(5);
+  await expect.poll(() => context.pages().slice(1).map((p) => p.url()).sort()).toEqual([
+    'https://alt-web-staging.babelcoach.com/',
+    'https://anglais-gratuit-staging.babelcoach.com/',
+    'https://bon-et-gratuit-staging.babelcoach.com/',
+    'https://simplygoodfood-staging.babelcoach.com/',
+  ]);
+  await expect(staging.locator('[data-blocked]')).toBeHidden();
+  await context.close();
+});
+
+test('without JavaScript the Links page shows the links and no button', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await signInThroughPage(page);
+  await page.goto(`${A}/links`);
+  await expect(page.locator('[data-link]')).toHaveCount(8);
+  await expect(page.getByRole('button', { name: 'Open all 4' })).toHaveCount(0);
+  await context.close();
+});

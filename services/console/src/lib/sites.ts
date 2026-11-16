@@ -1,12 +1,14 @@
 import { parse } from 'yaml';
 import { z } from 'zod';
 
+const host = z.string().regex(/^([a-z0-9-]+\.)+[a-z]{2,63}$/, 'must be a host name');
 const hex = z.string().regex(/^#[0-9a-f]{6}$/i, 'must be a #rrggbb colour');
 
 const siteSchema = z.object({
   name: z.string().min(1).max(60),
   short: z.string().min(1).max(4),
-  domain: z.string().regex(/^([a-z0-9-]+\.)+[a-z]{2,63}$/, 'must be a host name'),
+  domain: host,
+  staging: host,
   color: z.object({ light: hex, dark: hex }),
   umami: z.uuid(),
   search_console: z.string().regex(/^(sc-domain:[a-z0-9.-]+|https:\/\/.+\/)$/).optional(),
@@ -19,7 +21,10 @@ export interface Site {
   name: string;
   /** Abbreviation for tight places (chart end labels). */
   short: string;
+  /** Production host. */
   domain: string;
+  /** Staging host. */
+  staging: string;
   color: { light: string; dark: string };
   umamiId: string;
   searchConsole?: string;
@@ -39,6 +44,7 @@ export function parseSites(text: string): Sites {
     name: s.name,
     short: s.short,
     domain: s.domain,
+    staging: s.staging,
     color: s.color,
     umamiId: s.umami,
     searchConsole: s.search_console,

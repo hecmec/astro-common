@@ -301,3 +301,21 @@ test.describe('console-search', () => {
     expect(search).toMatch(/aria-current="page"[^>]*data-menu-item="search"|data-menu-item="search"[^>]*aria-current="page"/);
   });
 });
+
+test.describe('links', () => {
+  const STAGING = ['anglais-gratuit-staging.babelcoach.com', 'simplygoodfood-staging.babelcoach.com', 'alt-web-staging.babelcoach.com', 'bon-et-gratuit-staging.babelcoach.com'];
+  const PROD = ['www.anglais-gratuit.org', 'www.simplygoodfood.eu', 'www.alt-web.org', 'www.bon-et-gratuit.fr'];
+
+  test('two columns, staging and production, with the four sites each, opening in new tabs', async () => {
+    const r = await signedIn();
+    const html = await (await r.get('/links')).text();
+    const staging = html.slice(html.indexOf('data-env="staging"'), html.indexOf('data-env="production"'));
+    const prod = html.slice(html.indexOf('data-env="production"'));
+    for (const h of STAGING) expect(staging).toContain(`href="https://${h}/" target="_blank" rel="noopener"`);
+    for (const h of PROD) expect(prod).toContain(`href="https://${h}/" target="_blank" rel="noopener"`);
+    expect(staging.match(/data-link=/g)).toHaveLength(4);
+    expect(prod.match(/data-link=/g)).toHaveLength(4);
+    expect(html.match(/data-open-all=/g)).toHaveLength(2);
+    expect(html).toMatch(/aria-current="page"[^>]*data-menu-item="links"|data-menu-item="links"[^>]*aria-current="page"/);
+  });
+});
