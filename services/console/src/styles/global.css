@@ -2,22 +2,29 @@
 /* The chart tooltip script builds elements with these classes. */
 @source "../../public/chart.js";
 
-/* One token set, light and dark (surfaces validated with the site colours, see src/lib/colors.ts). */
+/* The console is light only: both pages set data-theme="light" on <html>, so the dark sets
+   below stay unused, kept for a later theme switch. The chart surface is validated with the
+   site colours, see src/lib/colors.ts. */
 :root {
   color-scheme: light;
-  --bg: #f4f4f2;
-  --surface: #fcfcfb;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --soft: #f1f4f8;
   --fg: #0b0b0b;
   --fg-soft: #52514e;
   --muted: #6b6a66;
-  --line: #e2e1dc;
-  --grid: #e9e8e4;
-  --btn: #1f1f1e;
-  --btn-fg: #fcfcfb;
+  --line: #e2e4e8;
+  --grid: #eceef1;
+  --btn: #1d4f91;
+  --btn-fg: #ffffff;
   --danger: #b42318;
   --danger-bg: #fdecea;
   --notice-bg: #eef4fc;
   --focus: #2a78d6;
+  --sidebar: #e8f1fc;
+  --sidebar-hover: #d9e8fa;
+  --sidebar-active: #c7ddf7;
+  --sidebar-line: #c9dcf3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,11 +43,21 @@
     --danger-bg: #3a1d1b;
     --notice-bg: #1d2a3a;
     --focus: #3987e5;
+    --soft: #232321;
+    --sidebar: #16202c;
+    --sidebar-hover: #1d2a3a;
+    --sidebar-active: #24354a;
+    --sidebar-line: #2b3b50;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --soft: #232321;
+  --sidebar: #16202c;
+  --sidebar-hover: #1d2a3a;
+  --sidebar-active: #24354a;
+  --sidebar-line: #2b3b50;
   --bg: #121211;
   --surface: #1a1a19;
   --fg: #f0efec;

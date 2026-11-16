@@ -1,0 +1,37 @@
+---
+// The chart's figures as a table, newest day first (the chart's accessible alternative).
+import { formatNumber } from '../lib/chart.ts';
+import { shortDay } from '../lib/dates.ts';
+import type { Site } from '../lib/sites.ts';
+
+interface Props {
+  days: string[];
+  series: { site: Site; values: number[] | null }[];
+}
+const { days, series } = Astro.props;
+const rows = days.map((d, i) => ({ d, i })).reverse();
+---
+
+<details class="mt-4" data-table>
+  <summary class="cursor-pointer text-sm font-medium">Show as table</summary>
+  <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-sm tabular-nums">
+      <thead>
+        <tr class="border-b border-(--line) text-left">
+          <th class="py-1 pr-4 font-medium">Day</th>
+          {series.map((s) => <th class="py-1 pr-4 text-right font-medium">{s.site.name}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map(({ d, i }) => (
+            <tr class="border-b border-(--line)">
+              <td class="py-1 pr-4">{shortDay(d)}</td>
+              {series.map((s) => <td class="py-1 pr-4 text-right">{s.values ? formatNumber(s.values[i]!) : '-'}</td>)}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</details>

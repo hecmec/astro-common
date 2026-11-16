@@ -75,3 +75,19 @@ test('the menu folds behind a button on a narrow screen', async ({ browser }) =>
   expect(overflow).toBe(false);
   await context.close();
 });
+
+test('Search works with JavaScript disabled: range, metric and site', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await signInThroughPage(page);
+  await page.getByRole('link', { name: 'Search' }).click();
+  await expect(page.locator('polyline')).toHaveCount(4);
+  await page.getByRole('link', { name: '7 days' }).click();
+  await expect(page.locator('[data-point="alt-web"]')).toHaveCount(7);
+  await page.getByRole('link', { name: 'Impressions' }).click();
+  await expect(page).toHaveURL(/range=7&metric=impressions/);
+  await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'Alt Web' }).click();
+  await expect(page).toHaveURL(/range=7&metric=impressions&site=alt-web/);
+  await expect(page.locator('[data-top-row]')).toHaveCount(2);
+  await context.close();
+});

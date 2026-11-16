@@ -1,0 +1,23 @@
+---
+// Each site's total for the period, with its colour dot: the chart's legend.
+import { formatNumber } from '../lib/chart.ts';
+import type { Site } from '../lib/sites.ts';
+
+interface Props {
+  label: string;
+  series: { site: Site; total: number | null }[];
+}
+const { label, series } = Astro.props;
+---
+
+<ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-(--line) pt-3 text-sm" aria-label={label} data-totals>
+  {
+    series.map((s) => (
+      <li class="flex items-center gap-2" data-total={s.site.id}>
+        <span class="site-dot" style={`background: var(--site-${s.site.id})`} aria-hidden="true" />
+        <span class="text-(--fg-soft)">{s.site.name}</span>
+        <span class="font-semibold tabular-nums">{s.total === null ? 'unavailable' : formatNumber(s.total)}</span>
+      </li>
+    ))
+  }
+</ul>

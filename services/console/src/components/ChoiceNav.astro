@@ -1,0 +1,31 @@
+---
+// A row of links choosing one value (range, metric, site), kept in the page address.
+interface Item {
+  href: string;
+  label: string;
+  current: boolean;
+  /** data-* attribute name and value, for tests: e.g. ['range', '30']. */
+  data?: [string, string];
+}
+interface Props {
+  label: string;
+  items: Item[];
+}
+const { label, items } = Astro.props;
+const pill = 'rounded-md px-3 py-1 text-sm font-medium';
+---
+
+<nav class="flex flex-wrap gap-1 rounded-lg border border-(--line) bg-(--surface) p-1" aria-label={label}>
+  {
+    items.map((i) => (
+      <a
+        href={i.href}
+        class:list={[pill, i.current ? 'bg-(--btn) text-(--btn-fg)' : 'hover:bg-(--soft)']}
+        aria-current={i.current ? 'page' : undefined}
+        {...(i.data ? { [`data-${i.data[0]}`]: i.data[1] } : {})}
+      >
+        {i.label}
+      </a>
+    ))
+  }
+</nav>

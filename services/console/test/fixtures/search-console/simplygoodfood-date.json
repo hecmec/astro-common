@@ -1,0 +1,132 @@
+{
+  "_recorded": "2026-11-16 from the Search Console API (searchAnalytics.query, type web)",
+  "request": {
+    "startDate": "2026-08-08",
+    "endDate": "2026-11-16",
+    "dimensions": [
+      "date"
+    ]
+  },
+  "response": {
+    "rows": [
+      {
+        "keys": [
+          "2026-11-02"
+        ],
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0
+      },
+      {
+        "keys": [
+          "2026-11-03"
+        ],
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 8
+      },
+      {
+        "keys": [
+          "2026-11-04"
+        ],
+        "clicks": 1,
+        "impressions": 56,
+        "ctr": 0.017857142857142856,
+        "position": 23.625
+      },
+      {
+        "keys": [
+          "2026-11-05"
+        ],
+        "clicks": 1,
+        "impressions": 286,
+        "ctr": 0.0034965034965034965,
+        "position": 22.458041958041957
+      },
+      {
+        "keys": [
+          "2026-11-06"
+        ],
+        "clicks": 5,
+        "impressions": 385,
+        "ctr": 0.012987012987012988,
+        "position": 27.72987012987013
+      },
+      {
+        "keys": [
+          "2026-11-07"
+        ],
+        "clicks": 13,
+        "impressions": 531,
+        "ctr": 0.02448210922787194,
+        "position": 17.29190207156309
+      },
+      {
+        "keys": [
+          "2026-11-08"
+        ],
+        "clicks": 7,
+        "impressions": 429,
+        "ctr": 0.016317016317016316,
+        "position": 19.65268065268065
+      },
+      {
+        "keys": [
+          "2026-11-09"
+        ],
+        "clicks": 4,
+        "impressions": 377,
+        "ctr": 0.010610079575596816,
+        "position": 21.636604774535808
+      },
+      {
+        "keys": [
+          "2026-11-10"
+        ],
+        "clicks": 4,
+        "impressions": 478,
+        "ctr": 0.008368200836820083,
+        "position": 16.615062761506277
+      },
+      {
+        "keys": [
+          "2026-11-11"
+        ],
+        "clicks": 5,
+        "impressions": 539,
+        "ctr": 0.00927643784786642,
+        "position": 15.634508348794062
+      },
+      {
+        "keys": [
+          "2026-11-12"
+        ],
+        "clicks": 4,
+        "impressions": 429,
+        "ctr": 0.009324009324009324,
+        "position": 19.372960372960375
+      },
+      {
+        "keys": [
+          "2026-11-13"
+        ],
+        "clicks": 1,
+        "impressions": 578,
+        "ctr": 0.0017301038062283738,
+        "position": 32.674740484429066
+      },
+      {
+        "keys": [
+          "2026-11-14"
+        ],
+        "clicks": 6,
+        "impressions": 503,
+        "ctr": 0.011928429423459244,
+        "position": 26.679920477137177
+      }
+    ],
+    "responseAggregationType": "byProperty"
+  }
+}

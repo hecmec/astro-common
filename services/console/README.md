@@ -1,11 +1,12 @@
 # Console
 
-The BabelCoach admins run the four sites from here: Alt Web, Simply Good Food, Anglais gratuit and Bon et gratuit. It is an Astro app rendered on the server for every request (Node adapter, standalone). Specs: `admin-console`, `console-visits`, plus the comments specs it uses (`comment-moderation`, `site-rebuild`, `comment-admin-api`) in [openspec](../../openspec).
+The BabelCoach admins run the four sites from here: Alt Web, Simply Good Food, Anglais gratuit and Bon et gratuit. It is an Astro app rendered on the server for every request (Node adapter, standalone). Specs: `admin-console`, `console-visits`, `console-search`, plus the comments specs it uses (`comment-moderation`, `site-rebuild`, `comment-admin-api`) in [openspec](../../openspec).
 
 | Page | What |
 | --- | --- |
 | `/comments` | Moderation of the four sites: status tabs with counts, filters by site (`?site=alt-web`) and page (`?path=/x/`), publish, refuse/unpublish, sticky, public reply, block a reader; the site rebuild status and "Rebuild changed sites now". Every action is a plain form post and comes back to the same tab and filters |
 | `/visits` | One chart with the four sites' daily visitors or pageviews over 7, 30 or 90 days (`?range=90&metric=pageviews`), from Umami; totals per site; a table view |
+| `/search` | Google Search clicks or impressions of the four sites in one chart over 7, 30 or 90 days ending on Search Console's latest published day (`?range=7&metric=impressions`), totals, a table view, and the top 25 searches of all sites or one (`?site=alt-web`) |
 | `/healthz` | Health check, no sign-in |
 
 The left menu shows the number of pending comments. Everything works without JavaScript; `/chart.js` only adds a crosshair tooltip to the chart.
@@ -14,6 +15,7 @@ The left menu shows the number of pending comments. Everything works without Jav
 
 - **Comments**: the console calls the comments service's admin API (`/api/admin/v1`, see [its README](../comments/README.md#admin-api)) from its server, with the shared `CONSOLE_TOKEN`. The browser never talks to the comments service.
 - **Visits**: the console logs in to Umami v3 (`POST /api/auth/login`) with a view-only account, keeps the token in memory (logs in again once on a 401), and reads `GET /api/websites/<id>/pageviews?unit=day&timezone=Europe/Paris` for each site in parallel. Results stay 5 minutes in memory per range. A site that fails is left out with a notice; Umami down shows "Visit statistics are unavailable". "Visitors" are Umami's sessions per day.
+- **Search**: the console signs in to Google as a service account (an RS256 JWT signed with `node:crypto`, exchanged at `oauth2.googleapis.com/token` for an access token kept until five minutes before it expires) and calls the Search Console API, `POST /webmasters/v3/sites/sc-domain%3A…/searchAnalytics/query`: once per site for the last 100 days by date (one answer serves all ranges; the period ends on the latest day with data, as Search Console lags two to three days), and once per site and range for the top 25 searches. Answers stay an hour in memory, so at most about 16 requests an hour. Days are Google's (Pacific Time). Rows grouped by search leave out rare searches, which the page says. A property not shared with the account (403) is left out with a notice.
 - **Sign-in**: Google (shared package [`@babelcoach/google-auth`](../../packages/google-auth)), then the verified email must be in `ADMIN_EMAILS`. The session is a cookie signed with HMAC-SHA256 under `SESSION_SECRET` (email and a 30-day expiry), HttpOnly, Secure in production, SameSite=Lax. There is no database: changing `SESSION_SECRET` signs everyone out, and removing an email from `ADMIN_EMAILS` locks that person out at once.
 - **Security**: every POST must carry `Origin` = `CONSOLE_URL` (403 otherwise; Astro's own origin check is off because behind the proxy Astro does not see the public URL). Pages send a CSP with `script-src 'self'`, `X-Frame-Options: DENY` and `Cache-Control: no-store`.
 
@@ -34,10 +36,19 @@ Each site has a colour that recalls it, with a light and a dark step: lime for A
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | The same Google OAuth client as the comments service, with the redirect URI `<CONSOLE_URL>/auth/google/callback` added |
 | `ADMIN_EMAILS` | Comma-separated Google accounts allowed in |
 | `SESSION_SECRET` | Cookie signing key, at least 32 characters (development: random at each start) |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | The service account's JSON key (raw, or base64 of it), read-only on the four Search Console properties (below). Without it the Search page says the statistics are unavailable |
+| `SEARCH_CONSOLE_API_URL`, `GOOGLE_TOKEN_URL` | Tests only (the browser tests point them at the fake upstream server); refused in production |
 | `PORT`, `HOST` | Default 4340; the image sets `HOST=::` |
 | `DEV_MODE` | Development only (refused when `NODE_ENV=production`): the sign-in page offers a sign-in without Google, still limited to `ADMIN_EMAILS` |
 
 In production, a configuration without `CONSOLE_URL`/`COMMENTS_API_URL` in https, `CONSOLE_TOKEN`, `SESSION_SECRET`, the Google client or `ADMIN_EMAILS` makes every request answer 500, the health check included, and the log lists the problems. Coolify then keeps the previous deployment online.
+
+### Search Console access
+
+1. In [Google Cloud](https://console.cloud.google.com/), create a project (or reuse one) and enable the **Google Search Console API** (APIs & Services → Library).
+2. IAM & Admin → Service accounts → **Create service account** (e.g. `babelcoach-console`), no roles needed. Open it → Keys → **Add key → JSON**: a file downloads; it is the secret.
+3. In [Search Console](https://search.google.com/search-console), for each of `sc-domain:anglais-gratuit.org`, `sc-domain:simplygoodfood.eu`, `sc-domain:alt-web.org` and `sc-domain:bon-et-gratuit.fr`: Settings → Users and permissions → **Add user**, the service account's email (`…@….iam.gserviceaccount.com`), permission **Restricted**.
+4. Put the key in the variable `GOOGLE_SERVICE_ACCOUNT_JSON`: the file's content on one line, or `base64 -w0 key.json`.
 
 ### Umami account
 
@@ -52,10 +63,10 @@ CONSOLE_TOKEN=dev-console-token pnpm dev
 CONSOLE_TOKEN=dev-console-token ADMIN_EMAILS=you@example.org pnpm dev:console
 ```
 
-Add `UMAMI_URL`, `UMAMI_USERNAME` and `UMAMI_PASSWORD` to see real visits.
+Add `UMAMI_URL`, `UMAMI_USERNAME` and `UMAMI_PASSWORD` to see real visits, and `GOOGLE_SERVICE_ACCOUNT_JSON` for real Search Console figures.
 
-- `pnpm --filter @babelcoach/console test`: unit tests (configuration, sites and colours, session, sign-in, guard, API clients, visits, chart, components)
-- `pnpm --filter @babelcoach/console test:e2e`: builds the console and runs Playwright against fake upstreams ([`e2e/fakes.ts`](e2e/fakes.ts)), with three console instances (all fine; comments down and one Umami site failing; Umami down), also with JavaScript disabled
+- `pnpm --filter @babelcoach/console test`: unit tests (configuration, sites and colours, session, sign-in, guard, API clients including the Search Console sign-in, visits, search, chart, components)
+- `pnpm --filter @babelcoach/console test:e2e`: builds the console and runs Playwright against fake upstreams ([`e2e/fakes.ts`](e2e/fakes.ts)), with three console instances (all fine; comments down and one site failing in Umami and Search Console; Umami and Search Console down) and a throwaway service-account key, also with JavaScript disabled
 - `pnpm --filter @babelcoach/console check`: `astro check` (TypeScript 6 in this package: `@astrojs/check` cannot drive the native TypeScript 7 of the workspace root)
 
 ## Deploy (Coolify)
@@ -65,7 +76,7 @@ Live at https://console.babelcoach.com: Coolify project `astro-common`, environm
 - Build pack Dockerfile, file `services/console/Dockerfile`, build context the repository root, port 4340.
 - Health check `/healthz` on port 4340 (the server listens on IPv6 and IPv4).
 - No volume: the console keeps no data.
-- Runtime variables: `CONSOLE_URL`, `COMMENTS_API_URL`, `CONSOLE_TOKEN`, `UMAMI_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS`, `SESSION_SECRET`, and **`HOST=::`**. Coolify injects `HOST=0.0.0.0` into every application, which overrides the image's `HOST=::`: the server then listens on IPv4 only, `localhost` (`::1` in the image) refuses the health check and Coolify rolls the deployment back.
+- Runtime variables: `CONSOLE_URL`, `COMMENTS_API_URL`, `CONSOLE_TOKEN`, `UMAMI_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_SERVICE_ACCOUNT_JSON`, `ADMIN_EMAILS`, `SESSION_SECRET`, and **`HOST=::`**. Coolify injects `HOST=0.0.0.0` into every application, which overrides the image's `HOST=::`: the server then listens on IPv4 only, `localhost` (`::1` in the image) refuses the health check and Coolify rolls the deployment back.
 - Application uuid `scsh0dmgyxiqxcxqipkdwnrl`.
 - On the `comments` application: the same `CONSOLE_TOKEN`, and `CONSOLE_URL` so the new-comment email links here.
 

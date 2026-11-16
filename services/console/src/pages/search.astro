@@ -1,0 +1,131 @@
+---
+// Search page (spec console-search): Google Search clicks or impressions of the four
+// sites in one chart, 7/30/90 days ending on Search Console's latest day, totals, a table
+// view and the top searches.
+import ChoiceNav from '../components/ChoiceNav.astro';
+import DailyTable from '../components/DailyTable.astro';
+import LineChart from '../components/LineChart.astro';
+import SiteBadge from '../components/SiteBadge.astro';
+import SiteTotals from '../components/SiteTotals.astro';
+import Console from '../layouts/Console.astro';
+import { formatNumber } from '../lib/chart.ts';
+import { getContext } from '../lib/context.ts';
+import { shortDay } from '../lib/dates.ts';
+import { RANGES, type Range, parseRange } from '../lib/ranges.ts';
+import { SEARCH_METRICS, type SearchMetric, parseSearchMetric } from '../lib/search.ts';
+
+const { search, sites } = getContext();
+const range = parseRange(Astro.url.searchParams.get('range'));
+const metric = parseSearchMetric(Astro.url.searchParams.get('metric'));
+const siteParam = Astro.url.searchParams.get('site');
+const siteId = sites.some((s) => s.id === siteParam) ? siteParam! : undefined;
+const data = await search.get(range, metric, siteId);
+if (data.unavailable) Astro.response.status = 503;
+
+const UNITS: Record<SearchMetric, [string, string]> = { clicks: ['click', 'clicks'], impressions: ['impression', 'impressions'] };
+const LABELS: Record<SearchMetric, string> = { clicks: 'Clicks', impressions: 'Impressions' };
+const href = (r: Range, m: SearchMetric, site = siteId) => {
+  const q = new URLSearchParams({ range: String(r), metric: m });
+  if (site) q.set('site', site);
+  return `/search?${q}`;
+};
+const chartInput = {
+  days: data.days,
+  unit: UNITS[metric],
+  series: data.series.map((s) => ({ id: s.site.id, name: s.site.name, short: s.site.short, color: `var(--site-${s.site.id})`, values: s.values })),
+};
+const latest = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${data.latestDay}T00:00:00Z`));
+const title = `Daily ${metric} from Google Search per site, ${range} days to ${shortDay(data.latestDay)}`;
+const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
+---
+
+<Console title="Search" current="search">
+  <h1 class="mb-4 text-2xl font-bold">Search</h1>
+
+  <div class="mb-4 flex flex-wrap items-center gap-4" data-controls>
+    <ChoiceNav label="Range" items={RANGES.map((r) => ({ href: href(r, metric), label: `${r} days`, current: r === range, data: ['range', String(r)] }))} />
+    <ChoiceNav label="Metric" items={SEARCH_METRICS.map((m) => ({ href: href(range, m), label: LABELS[m], current: m === metric, data: ['metric', m] }))} />
+  </div>
+
+  {
+    data.unavailable ? (
+      <p class="notice notice-error" role="alert" data-unavailable>
+        Search statistics are unavailable.
+      </p>
+    ) : (
+      <>
+        {data.failed.length > 0 && (
+          <p class="notice notice-error mb-4" role="status" data-failed>
+            No Search Console data for {data.failed.map((s) => s.name).join(', ')} right now; the other sites are shown.
+          </p>
+        )}
+        <section class="card">
+          <LineChart input={chartInput} title={title} />
+          <SiteTotals label={`Totals over ${range} days`} series={data.series} />
+        </section>
+        <p class="mt-3 text-sm text-(--fg-soft)" data-note>
+          Search Console publishes its data two to three days late: these figures go up to <strong data-latest-day={data.latestDay}>{latest}</strong>. Days are Google's days (Pacific Time). Figures are at most one hour old.
+        </p>
+        <DailyTable days={data.days} series={data.series} />
+
+        <section class="mt-8" aria-labelledby="top-title" data-top>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 id="top-title" class="text-lg font-semibold">
+              Top searches
+            </h2>
+            <ChoiceNav
+              label="Site"
+              items={[
+                { href: href(range, metric, undefined), label: 'All sites', current: !siteId, data: ['site-filter', 'all'] },
+                ...sites.map((s) => ({ href: href(range, metric, s.id), label: s.name, current: s.id === siteId, data: ['site-filter', s.id] as [string, string] })),
+              ]}
+            />
+          </div>
+          {data.topFailed.length > 0 && (
+            <p class="notice notice-error mb-3" role="status" data-top-failed>
+              No top searches for {data.topFailed.map((s) => s.name).join(', ')} right now.
+            </p>
+          )}
+          {data.top.length === 0 ? (
+            <p class="notice" data-top-empty>
+              No searches with clicks in this period{data.site ? ` for ${data.site.name}` : ''}.
+            </p>
+          ) : (
+            <div class="card overflow-x-auto p-0">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-(--line) text-left">
+                    <th class="px-3 py-2 font-medium">Search</th>
+                    <th class="px-3 py-2 font-medium">Site</th>
+                    <th class="px-3 py-2 text-right font-medium">Clicks</th>
+                    <th class="px-3 py-2 text-right font-medium">Impressions</th>
+                    <th class="px-3 py-2 text-right font-medium">CTR</th>
+                    <th class="px-3 py-2 text-right font-medium">Position</th>
+                  </tr>
+                </thead>
+                <tbody class="tabular-nums">
+                  {data.top.map((t) => (
+                    <tr class="border-b border-(--line) last:border-0" data-top-row={t.site.id}>
+                      <td class="px-3 py-2 break-words">{t.query}</td>
+                      <td class="px-3 py-2">
+                        <SiteBadge site={t.site} />
+                      </td>
+                      <td class="px-3 py-2 text-right">{formatNumber(t.clicks)}</td>
+                      <td class="px-3 py-2 text-right">{formatNumber(t.impressions)}</td>
+                      <td class="px-3 py-2 text-right">{pct(t.ctr)}</td>
+                      <td class="px-3 py-2 text-right">{t.position.toFixed(1)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p class="mt-2 text-sm text-(--fg-soft)" data-privacy-note>
+            Google leaves out rare searches to protect searchers' privacy, so the searches listed here add up to less than the totals above.
+          </p>
+        </section>
+      </>
+    )
+  }
+  <script is:inline src="/chart.js" defer></script>
+</Console>

@@ -1,20 +1,13 @@
 import { TIMEZONE, lastDays, parisMidnight } from './dates.ts';
+import { type Range, sum } from './ranges.ts';
 import type { Site, Sites } from './sites.ts';
 import type { DailyStats, UmamiClient } from './umami.ts';
-
-export const RANGES = [7, 30, 90] as const;
-export type Range = (typeof RANGES)[number];
-export const DEFAULT_RANGE: Range = 30;
 
 export const METRICS = ['visitors', 'pageviews'] as const;
 export type Metric = (typeof METRICS)[number];
 export const DEFAULT_METRIC: Metric = 'visitors';
 
 export const CACHE_TTL = 5 * 60 * 1000;
-
-export function parseRange(value: string | null | undefined): Range {
-  return RANGES.find((r) => String(r) === value) ?? DEFAULT_RANGE;
-}
 
 export function parseMetric(value: string | null | undefined): Metric {
   return METRICS.find((m) => m === value) ?? DEFAULT_METRIC;
@@ -84,7 +77,7 @@ export class VisitsService {
       if (!stats) return { site, values: null, total: null };
       const byDay = new Map((metric === 'visitors' ? stats.sessions : stats.pageviews).map((p) => [p.day, p.value]));
       const values = days.map((d) => byDay.get(d) ?? 0); // Umami omits days without visits
-      return { site, values, total: values.reduce((a, b) => a + b, 0) };
+      return { site, values, total: sum(values) };
     });
     const failed = series.filter((s) => s.values === null).map((s) => s.site);
     return { days, range, metric, series, failed, unavailable: failed.length === series.length };

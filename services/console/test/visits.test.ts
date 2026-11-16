@@ -3,7 +3,8 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lastDays, parisDay, parisMidnight } from '../src/lib/dates.ts';
 import type { UmamiClient } from '../src/lib/umami.ts';
-import { CACHE_TTL, VisitsService, parseMetric, parseRange } from '../src/lib/visits.ts';
+import { parseRange } from '../src/lib/ranges.ts';
+import { CACHE_TTL, VisitsService, parseMetric } from '../src/lib/visits.ts';
 import { sites } from './helpers.ts';
 
 const NOW = Date.parse('2026-11-16T09:30:00Z'); // 10:30 in Paris

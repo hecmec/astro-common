@@ -14,6 +14,8 @@ export function config(over: Partial<ConsoleConfig> = {}): ConsoleConfig {
     sessionSecret: 's'.repeat(40),
     devMode: false,
     production: false,
+    searchConsoleApiUrl: 'https://searchconsole.test',
+    googleTokenUrl: 'https://oauth2.test/token',
     ...over,
   };
 }

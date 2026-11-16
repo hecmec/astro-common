@@ -6,7 +6,7 @@ import { getContext } from '../lib/context.ts';
 
 interface Props {
   title: string;
-  current: 'comments' | 'visits';
+  current: 'comments' | 'visits' | 'search';
   /** Pending comments of all sites, when the page already has them; else fetched here. */
   pending?: number | null;
 }
@@ -31,11 +31,12 @@ const siteColors = [
 const menu = [
   { id: 'comments', href: '/comments', label: 'Comments', count: pending },
   { id: 'visits', href: '/visits', label: 'Visits', count: null },
+  { id: 'search', href: '/search', label: 'Search', count: null },
 ] as const;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -46,7 +47,7 @@ const menu = [
   </head>
   <body class="min-h-screen">
     <div class="md:flex md:min-h-screen">
-      <aside class="flex flex-col border-b border-(--line) bg-(--surface) md:w-56 md:flex-none md:border-r md:border-b-0">
+      <aside class="flex flex-col border-b border-(--sidebar-line) bg-(--sidebar) md:w-56 md:flex-none md:border-r md:border-b-0">
         <!-- Narrow screens: the menu folds behind this checkbox (works without scripts). -->
         <input type="checkbox" id="menu-toggle" class="peer sr-only" />
         <div class="flex items-center justify-between px-4 py-3">
@@ -62,8 +63,8 @@ const menu = [
                     <a
                       href={item.href}
                       class:list={[
-                        'flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-(--bg)',
-                        item.id === current && 'bg-(--bg)',
+                        'flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-(--sidebar-hover)',
+                        item.id === current && 'bg-(--sidebar-active)',
                       ]}
                       aria-current={item.id === current ? 'page' : undefined}
                       data-menu-item={item.id}
@@ -80,7 +81,7 @@ const menu = [
               }
             </ul>
           </nav>
-          <div class="mt-auto border-t border-(--line) px-3 pt-3 text-sm">
+          <div class="mt-auto border-t border-(--sidebar-line) px-3 pt-3 text-sm">
             <p class="truncate text-(--fg-soft)" data-account>{Astro.locals.email}</p>
             <form method="post" action="/logout" class="mt-2">
               <button class="btn btn-secondary">Sign out</button>

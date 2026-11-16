@@ -215,3 +215,89 @@ test.describe('console-visits', () => {
     for (const secret of ['e2e-umami-pw', 'umami-session-token-not-for-pages', 'e2e-console-token', FAKES]) expect(html).not.toContain(secret);
   });
 });
+
+test.describe('console-search', () => {
+  const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
+  const latest = addDays(new Date().toISOString().slice(0, 10), -3);
+
+  test('opens on 30 days of clicks for the four sites, ending on the latest published day', async () => {
+    const r = await signedIn();
+    const res = await r.get('/search');
+    expect(res.status()).toBe(200);
+    const html = await res.text();
+    expect(html.match(/<polyline/g)).toHaveLength(4);
+    expect(html.match(/data-point="alt-web"/g)).toHaveLength(30);
+    expect(html).toContain(`data-latest-day="${latest}"`);
+    expect(html).toContain('two to three days late');
+    expect(html).toMatch(/data-range="30"[^>]*aria-current="page"|aria-current="page"[^>]*data-range="30"/);
+  });
+
+  test('7 days of impressions, kept in the address, with totals as legend', async () => {
+    const r = await signedIn();
+    const html = await (await r.get('/search?range=7&metric=impressions')).text();
+    expect(html.match(/data-point="simplygoodfood"/g)).toHaveLength(7);
+    expect(html).toContain('impressions</title>');
+    for (const id of ['anglais-gratuit', 'simplygoodfood', 'alt-web', 'bonetgratuit']) expect(html).toMatch(new RegExp(`data-total="${id}"[\\s\\S]*?\\d`));
+    expect(html).toContain('href="/search?range=90&amp;metric=impressions"');
+  });
+
+  test('top searches of all sites, most clicks first, each with its site', async () => {
+    const r = await signedIn();
+    const html = await (await r.get('/search')).text();
+    const rows = [...html.matchAll(/data-top-row="([a-z-]+)"/g)].map((m) => m[1]);
+    expect(new Set(rows)).toEqual(new Set(['anglais-gratuit', 'simplygoodfood', 'alt-web', 'bonetgratuit']));
+    expect(rows).toHaveLength(8);
+    expect(html).toContain('>anglais-gratuit free<');
+    expect(html).toContain('Google leaves out rare searches');
+  });
+
+  test('top searches of one site; the chart keeps the four sites', async () => {
+    const r = await signedIn();
+    const html = await (await r.get('/search?site=alt-web')).text();
+    const rows = [...html.matchAll(/data-top-row="([a-z-]+)"/g)].map((m) => m[1]);
+    expect(new Set(rows)).toEqual(new Set(['alt-web']));
+    expect(html.match(/<polyline/g)).toHaveLength(4);
+    expect(html).toMatch(/data-site-filter="alt-web"[^>]*aria-current="page"|aria-current="page"[^>]*data-site-filter="alt-web"/);
+  });
+
+  test('a reload within the hour does not ask Search Console again', async () => {
+    const r = await signedIn();
+    await r.get('/search?range=7');
+    const before = await umamiCalls();
+    await r.get('/search?range=7');
+    await r.get('/search?range=7&metric=impressions');
+    expect((await umamiCalls()).gscQuery).toBe(before.gscQuery);
+  });
+
+  test('a property not shared with the console: three lines and a notice naming it', async () => {
+    const r = await signedIn(B);
+    const html = await (await r.get('/search?range=7')).text();
+    expect(html.match(/<polyline/g)).toHaveLength(3);
+    expect(html).toContain('No Search Console data for Bon et gratuit right now');
+    expect(html).toMatch(/data-total="bonetgratuit"[\s\S]*?unavailable/);
+  });
+
+  test('Search Console down: a message and no chart', async () => {
+    const r = await signedIn(C);
+    const res = await r.get('/search');
+    expect(res.status()).toBe(503);
+    const html = await res.text();
+    expect(html).toContain('Search statistics are unavailable');
+    expect(html).not.toContain('<polyline');
+  });
+
+  test('the page source has figures but no key, token or service-account email', async () => {
+    const r = await signedIn();
+    const html = await (await r.get('/search')).text();
+    expect(html).toContain('clicks</title>');
+    for (const secret of ['PRIVATE KEY', 'gsc-access-token-not-for-pages', 'iam.gserviceaccount.com', FAKES]) expect(html).not.toContain(secret);
+  });
+
+  test('the menu offers Search after Visits, current on the Search page', async () => {
+    const r = await signedIn();
+    const comments = await (await r.get('/comments')).text();
+    expect(comments.indexOf('data-menu-item="visits"')).toBeLessThan(comments.indexOf('data-menu-item="search"'));
+    const search = await (await r.get('/search')).text();
+    expect(search).toMatch(/aria-current="page"[^>]*data-menu-item="search"|data-menu-item="search"[^>]*aria-current="page"/);
+  });
+});

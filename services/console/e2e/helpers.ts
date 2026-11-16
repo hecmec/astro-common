@@ -12,7 +12,7 @@ export async function resetFakes(): Promise<void> {
   await r.dispose();
 }
 
-export async function umamiCalls(): Promise<{ login: number; pageviews: number }> {
+export async function umamiCalls(): Promise<{ login: number; pageviews: number; gscToken: number; gscQuery: number }> {
   const r = await request.newContext();
   const stats = await (await r.get(`${FAKES}/__stats`)).json();
   await r.dispose();

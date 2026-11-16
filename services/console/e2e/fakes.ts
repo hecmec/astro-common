@@ -3,7 +3,9 @@
  * Umami v3, on one port. Path prefixes make a console instance see failures:
  *   /down/...      every request answers 503 (comments service or Umami down)
  *   /fail-bg/...   Umami fails for bon-et-gratuit only
- * POST /__reset restores the comments; GET /__stats gives the Umami request counts.
+ *   Search Console: POST /token (Google token endpoint), POST /webmasters/v3/sites/...;
+ *                  with /fail-bg/ the bon-et-gratuit property answers 403.
+ * POST /__reset restores the comments; GET /__stats gives the Umami and Search Console request counts.
  */
 import { createServer } from 'node:http';
 import { lastDays, parisDay } from '../src/lib/dates.ts';
@@ -45,7 +47,39 @@ interface Comment {
 const blocked = new Set<number>();
 let comments: Comment[] = [];
 let rebuildRuns = 0;
-const umamiCalls = { login: 0, pageviews: 0 };
+const umamiCalls = { login: 0, pageviews: 0, gscToken: 0, gscQuery: 0 };
+const GSC_TOKEN = 'gsc-access-token-not-for-pages';
+const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
+
+/** Search Analytics: daily rows up to three days ago (Search Console's delay), a few queries per property. */
+function searchConsole(method: string, path: string, body: unknown, auth: string | undefined, failBg: boolean): [number, unknown] | undefined {
+  if (path === '/token' && method === 'POST') {
+    umamiCalls.gscToken++;
+    return [200, { access_token: GSC_TOKEN, expires_in: 3599, token_type: 'Bearer' }];
+  }
+  const m = /^\/webmasters\/v3\/sites\/([^/]+)\/searchAnalytics\/query$/.exec(path);
+  if (!m || method !== 'POST') return undefined;
+  umamiCalls.gscQuery++;
+  if (auth !== `Bearer ${GSC_TOKEN}`) return [401, { error: { code: 401 } }];
+  const property = decodeURIComponent(m[1]!);
+  if (failBg && property === 'sc-domain:bon-et-gratuit.fr') return [403, { error: { code: 403, message: 'User does not have sufficient permission' } }];
+  const b = body as { startDate: string; endDate: string; dimensions: string[]; rowLimit?: number };
+  const level = property.length * 3;
+  if (b.dimensions[0] === 'date') {
+    const latest = addDays(new Date().toISOString().slice(0, 10), -3);
+    const rows = [];
+    for (let d = b.startDate, i = 0; d <= b.endDate && d <= latest; d = addDays(d, 1), i++) {
+      if (i % 13 === 5) continue; // a day without impressions
+      rows.push({ keys: [d], clicks: level + (i % 4), impressions: level * 20 + (i % 9) * 3, ctr: 0.05, position: 7.5 });
+    }
+    return [200, { rows, responseAggregationType: 'byProperty' }];
+  }
+  const name = property.replace('sc-domain:', '').split('.')[0];
+  return [200, { rows: [
+    { keys: [`${name} free`], clicks: level, impressions: level * 12, ctr: 1 / 12, position: 2.3 },
+    { keys: [`${name} review`], clicks: Math.floor(level / 3), impressions: level * 30, ctr: 1 / 90, position: 11.8 },
+  ], responseAggregationType: 'byProperty' }];
+}
 
 function seed() {
   const c = (id: number, site: string, path: string, status: Status, created: string, body: string, author: string, user: number, extra: Partial<Comment> = {}): Comment => ({
@@ -186,6 +220,8 @@ createServer(async (req, res) => {
   const failBg = path.startsWith('/fail-bg/');
   if (failBg) path = path.slice('/fail-bg'.length);
 
+  const gsc = searchConsole(req.method ?? 'GET', path, body, req.headers.authorization, failBg);
+  if (gsc) return send(gsc[0], gsc[1]);
   if (path.startsWith('/api/admin/v1/')) {
     if (req.headers.authorization !== `Bearer ${TOKEN}`) return send(401, { error: 'unauthorized' });
     const [status, data] = adminApi(req.method ?? 'GET', path.slice('/api/admin/v1'.length), url.searchParams, body);

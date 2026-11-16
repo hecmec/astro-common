@@ -44,7 +44,7 @@ const scope = [filters.site ? siteById(sites, filters.site)!.name : 'all sites',
           data-tab={s}
         >
           {label(s)}
-          {list && <span class="ml-1 rounded-full bg-(--bg) px-1.5 text-xs" data-count>{list.counts[s]}</span>}
+          {list && <span class="ml-1 rounded-full bg-(--soft) px-1.5 text-xs" data-count>{list.counts[s]}</span>}
         </a>
       ))
     }

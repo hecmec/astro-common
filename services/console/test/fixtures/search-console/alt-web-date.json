@@ -1,0 +1,96 @@
+{
+  "_recorded": "2026-11-16 from the Search Console API (searchAnalytics.query, type web)",
+  "request": {
+    "startDate": "2026-08-08",
+    "endDate": "2026-11-16",
+    "dimensions": [
+      "date"
+    ]
+  },
+  "response": {
+    "rows": [
+      {
+        "keys": [
+          "2026-11-06"
+        ],
+        "clicks": 0,
+        "impressions": 0,
+        "ctr": 0,
+        "position": 0
+      },
+      {
+        "keys": [
+          "2026-11-07"
+        ],
+        "clicks": 0,
+        "impressions": 4,
+        "ctr": 0,
+        "position": 12.25
+      },
+      {
+        "keys": [
+          "2026-11-08"
+        ],
+        "clicks": 1,
+        "impressions": 302,
+        "ctr": 0.0033112582781456954,
+        "position": 10.21523178807947
+      },
+      {
+        "keys": [
+          "2026-11-09"
+        ],
+        "clicks": 1,
+        "impressions": 1184,
+        "ctr": 0.0008445945945945946,
+        "position": 11.974662162162161
+      },
+      {
+        "keys": [
+          "2026-11-10"
+        ],
+        "clicks": 1,
+        "impressions": 1058,
+        "ctr": 0.000945179584120983,
+        "position": 13.839319470699433
+      },
+      {
+        "keys": [
+          "2026-11-11"
+        ],
+        "clicks": 1,
+        "impressions": 892,
+        "ctr": 0.0011210762331838565,
+        "position": 12.409192825112108
+      },
+      {
+        "keys": [
+          "2026-11-12"
+        ],
+        "clicks": 0,
+        "impressions": 238,
+        "ctr": 0,
+        "position": 13.029411764705882
+      },
+      {
+        "keys": [
+          "2026-11-13"
+        ],
+        "clicks": 0,
+        "impressions": 23,
+        "ctr": 0,
+        "position": 57.391304347826086
+      },
+      {
+        "keys": [
+          "2026-11-14"
+        ],
+        "clicks": 0,
+        "impressions": 21,
+        "ctr": 0,
+        "position": 65.04761904761905
+      }
+    ],
+    "responseAggregationType": "byProperty"
+  }
+}

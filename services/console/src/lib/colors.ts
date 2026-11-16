@@ -6,7 +6,7 @@
  */
 
 /** Chart and page surfaces of the console (src/styles/global.css). */
-export const SURFACES = { light: '#fcfcfb', dark: '#1a1a19' } as const;
+export const SURFACES = { light: '#ffffff', dark: '#1a1a19' } as const;
 
 export type Vision = 'normal' | 'protan' | 'deutan' | 'tritan';
 

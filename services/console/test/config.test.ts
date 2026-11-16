@@ -53,3 +53,34 @@ describe('console configuration', () => {
     expect(loadConfig({}).sessionSecret).not.toBe(a.sessionSecret);
   });
 });
+
+describe('Search Console settings', () => {
+  const key = { type: 'service_account', client_email: 'console@project.iam.gserviceaccount.com', private_key: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n' };
+
+  it('are off without a key, with Google endpoints by default', () => {
+    const c = loadConfig({});
+    expect(c.searchConsole).toBeUndefined();
+    expect(c.searchConsoleApiUrl).toBe('https://searchconsole.googleapis.com');
+    expect(c.googleTokenUrl).toBe('https://oauth2.googleapis.com/token');
+  });
+
+  it('read the JSON key, raw or base64', () => {
+    const raw = loadConfig({ GOOGLE_SERVICE_ACCOUNT_JSON: JSON.stringify(key) }).searchConsole;
+    expect(raw).toEqual({ clientEmail: key.client_email, privateKey: key.private_key });
+    const b64 = loadConfig({ GOOGLE_SERVICE_ACCOUNT_JSON: Buffer.from(JSON.stringify(key)).toString('base64') }).searchConsole;
+    expect(b64).toEqual(raw);
+  });
+
+  it('refuse an invalid key', () => {
+    expect(() => loadConfig({ GOOGLE_SERVICE_ACCOUNT_JSON: '{nope' })).toThrow('GOOGLE_SERVICE_ACCOUNT_JSON is not a JSON key');
+    expect(() => loadConfig({ GOOGLE_SERVICE_ACCOUNT_JSON: JSON.stringify({ client_email: 'x' }) })).toThrow('needs client_email and private_key');
+  });
+
+  it('allow test endpoints outside production only', () => {
+    expect(loadConfig({ SEARCH_CONSOLE_API_URL: 'http://localhost:4389/', GOOGLE_TOKEN_URL: 'http://localhost:4389/token' })).toMatchObject({
+      searchConsoleApiUrl: 'http://localhost:4389',
+      googleTokenUrl: 'http://localhost:4389/token',
+    });
+    expect(() => loadConfig({ ...PROD, SEARCH_CONSOLE_API_URL: 'http://localhost:4389' })).toThrow('for tests only');
+  });
+});

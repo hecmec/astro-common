@@ -1,12 +1,18 @@
+import { generateKeyPairSync } from 'node:crypto';
 import { defineConfig } from '@playwright/test';
+
+// A throwaway service-account key for the fake Search Console (the console signs with it).
+const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
+export const SERVICE_ACCOUNT_EMAIL = 'console-e2e@fake-project.iam.gserviceaccount.com';
+const SERVICE_ACCOUNT = JSON.stringify({ type: 'service_account', client_email: SERVICE_ACCOUNT_EMAIL, private_key: privateKey });
 
 // Three builds of the same console against the fake upstreams (e2e/fakes.ts):
 //   A :4386  everything works
-//   B :4387  comments service down, Umami fails for bon-et-gratuit
-//   C :4388  Umami down
+//   B :4387  comments service down, Umami and Search Console fail for bon-et-gratuit
+//   C :4388  Umami and Search Console down
 // `pnpm test:e2e` builds the console first.
 const FAKES = 'http://localhost:4389';
-const env = (port: number, comments: string, umami: string) => ({
+const env = (port: number, comments: string, umami: string, search: string) => ({
   PORT: String(port),
   HOST: 'localhost',
   CONSOLE_URL: `http://localhost:${port}`,
@@ -18,11 +24,14 @@ const env = (port: number, comments: string, umami: string) => ({
   ADMIN_EMAILS: 'admin@example.org',
   SESSION_SECRET: 'e2e-session-secret-0123456789abcdefghij',
   DEV_MODE: 'true',
+  GOOGLE_SERVICE_ACCOUNT_JSON: SERVICE_ACCOUNT,
+  SEARCH_CONSOLE_API_URL: search,
+  GOOGLE_TOKEN_URL: `${FAKES}/token`,
 });
-const consoleServer = (port: number, comments: string, umami: string) => ({
+const consoleServer = (port: number, comments: string, umami: string, search: string) => ({
   command: 'node dist/server/entry.mjs',
   url: `http://localhost:${port}/healthz`,
-  env: env(port, comments, umami),
+  env: env(port, comments, umami, search),
   reuseExistingServer: false,
   stdout: 'pipe' as const,
 });
@@ -34,8 +43,8 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:4386', trace: 'retain-on-failure' },
   webServer: [
     { command: 'node e2e/fakes.ts', url: `${FAKES}/__stats`, reuseExistingServer: false, stdout: 'pipe' },
-    consoleServer(4386, FAKES, FAKES),
-    consoleServer(4387, `${FAKES}/down`, `${FAKES}/fail-bg`),
-    consoleServer(4388, FAKES, `${FAKES}/down`),
+    consoleServer(4386, FAKES, FAKES, FAKES),
+    consoleServer(4387, `${FAKES}/down`, `${FAKES}/fail-bg`, `${FAKES}/fail-bg`),
+    consoleServer(4388, FAKES, `${FAKES}/down`, `${FAKES}/down`),
   ],
 });
