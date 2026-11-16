@@ -4,7 +4,15 @@ import { describe, expect, it } from 'vitest';
 import { UmamiClient, UmamiError, bucketDay } from '../src/lib/umami.ts';
 import { fakeFetch, json } from './helpers.ts';
 
-const fixture = JSON.parse(readFileSync(resolve(import.meta.dirname, 'fixtures/umami-pageviews.json'), 'utf8'));
+/** Responses recorded from stats.babelcoach.com (test/fixtures/umami). */
+const recorded = (name: string) =>
+  JSON.parse(readFileSync(resolve(import.meta.dirname, `fixtures/umami/${name}.json`), 'utf8')) as {
+    query: Record<string, string>;
+    response: { pageviews: { x: string; y: number }[]; sessions: { x: string; y: number }[] };
+  };
+const ag90 = recorded('anglais-gratuit-90');
+const aw7 = recorded('alt-web-7');
+const fixture = aw7.response;
 const P = { startAt: 1, endAt: 2, timezone: 'Europe/Paris' };
 
 function umami(handler: Parameters<typeof fakeFetch>[0]) {
@@ -13,28 +21,37 @@ function umami(handler: Parameters<typeof fakeFetch>[0]) {
 }
 
 describe('Umami bucket days', () => {
-  it('take the date part, never shifting the literal Z', () => {
-    expect(bucketDay('2026-11-16T00:00:00Z')).toBe('2026-11-16');
-    expect(bucketDay('2026-11-16 00:00:00')).toBe('2026-11-16');
+  it('take the date part, in the format of stats.babelcoach.com and of newer Umami versions', () => {
+    expect(bucketDay('2026-11-16 00:00:00')).toBe('2026-11-16'); // stats.babelcoach.com
+    expect(bucketDay('2026-11-16T00:00:00Z')).toBe('2026-11-16'); // newer source: literal Z, not UTC
     expect(bucketDay('nope')).toBeUndefined();
     expect(bucketDay(17)).toBeUndefined();
   });
 });
 
 describe('Umami client', () => {
-  it('logs in once and reads daily pageviews and sessions in Paris time', async () => {
+  it('reads the recorded responses: one point per bucket, the day of x, the value of y', async () => {
+    for (const rec of [ag90, aw7]) {
+      const { client } = umami((url) => (url.pathname === '/api/auth/login' ? json({ token: 'tok' }) : json(rec.response)));
+      const stats = await client.daily('site', P);
+      for (const key of ['pageviews', 'sessions'] as const) {
+        expect(stats[key]).toEqual(rec.response[key].map((b) => ({ day: b.x.slice(0, 10), value: b.y })));
+        for (const p of stats[key]) expect(Number.isInteger(p.value) && p.value >= 0).toBe(true);
+      }
+      // a visitor makes at least one pageview
+      const pv = new Map(stats.pageviews.map((p) => [p.day, p.value]));
+      for (const s of stats.sessions) expect(s.value).toBeLessThanOrEqual(pv.get(s.day) ?? 0);
+    }
+    // Umami leaves out days without visits: the 90-day recording has gaps
+    const days = ag90.response.pageviews.map((b) => b.x.slice(0, 10));
+    expect(days.length).toBeLessThan(90);
+    expect(days).toEqual([...days].sort());
+  });
+
+  it('logs in once and asks for days in Paris time', async () => {
     const { client, calls } = umami((url) => (url.pathname === '/api/auth/login' ? json({ token: 'tok', user: {} }) : json(fixture)));
-    const a = await client.daily('site-1', P);
+    await client.daily('site-1', P);
     await client.daily('site-2', P);
-    expect(a.pageviews).toEqual([
-      { day: '2026-11-14', value: 120 },
-      { day: '2026-11-15', value: 98 },
-      { day: '2026-11-16', value: 41 },
-    ]);
-    expect(a.sessions).toEqual([
-      { day: '2026-11-14', value: 37 },
-      { day: '2026-11-16', value: 12 },
-    ]);
     expect(calls.map((c) => c.url.pathname)).toEqual(['/api/auth/login', '/api/websites/site-1/pageviews', '/api/websites/site-2/pageviews']);
     expect(Object.fromEntries(calls[1]!.url.searchParams)).toEqual({ startAt: '1', endAt: '2', unit: 'day', timezone: 'Europe/Paris' });
     expect(new Headers(calls[1]!.init.headers).get('authorization')).toBe('Bearer tok');

@@ -35,7 +35,7 @@
 
 ## 5. Console: Visits page
 
-- [ ] 5.1 Umami v3 client: login with token reuse, one re-login on 401, `pageviews` per website with `unit=day` and `timezone=Europe/Paris`; record real responses from `stats.babelcoach.com` as fixtures; verify unit tests on the fixtures
+- [x] 5.1 Umami v3 client: login with token reuse, one re-login on 401, `pageviews` per website with `unit=day` and `timezone=Europe/Paris`; record real responses from `stats.babelcoach.com` as fixtures; verify unit tests on the fixtures
 - [x] 5.2 Visits data: range (7/30/90, default 30, ending today) and metric (visitors/pageviews) from the query string, the four sites fetched in parallel, missing days filled with zero, per-site failure kept apart, 5-minute memory cache per range and metric; verify unit tests with a fake clock (cache hit within 5 minutes, miss after)
 - [x] 5.3 `LineChart` component: inline SVG, axis from zero, gridlines, date labels, one polyline per site in its colour, a `<title>` per point ("Alt Web, 12 Nov: 37 visitors"); verify unit tests on the rendered markup (point count, title text, empty series)
 - [x] 5.4 Visits page: range and metric links, chart, totals row as legend, note on how Umami counts visits, notice for a failed site, "Visit statistics are unavailable" when Umami is down; verify tests against the `console-visits` scenarios and that no Umami credential or token appears in the HTML

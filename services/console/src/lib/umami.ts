@@ -2,7 +2,9 @@
  * Umami v3 client (self-hosted, stats.babelcoach.com), with a view-only account.
  * POST /api/auth/login -> { token }; GET /api/websites/:id/pageviews?startAt&endAt&unit&timezone
  * -> { pageviews: [{ x, y }], sessions: [{ x, y }] }, where x is the bucket's wall-clock
- * time in the requested timezone, written "YYYY-MM-DDTHH:MM:SSZ" with a literal Z (not UTC).
+ * time in the requested timezone: "YYYY-MM-DD HH:MM:SS" on stats.babelcoach.com (recorded
+ * in test/fixtures/umami), "YYYY-MM-DDTHH:MM:SSZ" with a literal Z (not UTC) in newer
+ * Umami source. Both are read by their date part. Days without visits are left out.
  */
 
 export interface Point {

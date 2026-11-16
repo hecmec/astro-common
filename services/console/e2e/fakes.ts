@@ -141,7 +141,7 @@ function pageviews(websiteId: string, startAt: number, endAt: number) {
   const level = Number.parseInt(websiteId.slice(0, 2), 16) + 5;
   const first = parisDay(startAt);
   const days = lastDays(endAt, 120).filter((d) => d >= first);
-  const day = (d: string) => `${d}T00:00:00Z`;
+  const day = (d: string) => `${d} 00:00:00`; // as stats.babelcoach.com writes it
   return {
     pageviews: days.map((d, i) => ({ x: day(d), y: level * 3 + (i % 7) * 2 })),
     // A day without visits is left out, as Umami does.

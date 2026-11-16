@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lastDays, parisDay, parisMidnight } from '../src/lib/dates.ts';
 import type { UmamiClient } from '../src/lib/umami.ts';
@@ -32,6 +34,25 @@ describe('Paris days', () => {
     expect(new Date(parisMidnight('2026-07-01')).toISOString()).toBe('2026-06-30T22:00:00.000Z'); // CEST
     expect(new Date(parisMidnight('2026-10-25')).toISOString()).toBe('2026-10-24T22:00:00.000Z'); // DST ends that day
     expect(parisDay(Date.parse('2026-11-15T23:30:00Z'))).toBe('2026-11-16');
+  });
+});
+
+describe('visits from a recorded Umami response', () => {
+  it('fill the days Umami left out with zero and total the rest', async () => {
+    const rec = JSON.parse(readFileSync(resolve(import.meta.dirname, 'fixtures/umami/anglais-gratuit-90.json'), 'utf8'));
+    const endAt = Number(rec.query.endAt);
+    const umami = {
+      daily: async () => ({
+        pageviews: rec.response.pageviews.map((b: { x: string; y: number }) => ({ day: b.x.slice(0, 10), value: b.y })),
+        sessions: rec.response.sessions.map((b: { x: string; y: number }) => ({ day: b.x.slice(0, 10), value: b.y })),
+      }),
+    } as unknown as UmamiClient;
+    const data = await new VisitsService({ umami, sites, now: () => endAt }).get(90, 'visitors');
+    const values = data.series[0]!.values!;
+    expect(values).toHaveLength(90);
+    expect(values.filter((v) => v > 0)).toHaveLength(rec.response.sessions.length);
+    expect(data.series[0]!.total).toBe(rec.response.sessions.reduce((a: number, b: { y: number }) => a + b.y, 0));
+    expect(values.at(-1)).toBe(rec.response.sessions.at(-1).y); // today, counted so far
   });
 });
 
