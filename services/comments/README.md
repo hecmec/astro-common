@@ -28,6 +28,8 @@ Readers of the BabelCoach sites sign in (Google or an email link), comment on a 
 
 Comments enter a site's HTML only when the site is built. Every night at `REBUILD_AT` (Europe/Paris), the service computes each site's export and compares its fingerprint (comments, authors, texts, replies, reaction counts; not the dates) with the one of the last rebuild it requested. When it differs, it asks Coolify to deploy the site's production app (`rebuild.coolify_app` in `sites.yaml`, `POST /api/v1/deploy`). Unchanged sites are not rebuilt; a failed request is retried the next night. The admin page shows each site's last check and has a "Rebuild changed sites now" button, for example after unpublishing an old comment.
 
+The service runs on the same server as Coolify, so its deploy requests reach Coolify's API from Docker's internal networks, not from the server's public address. Coolify's **Settings → Advanced → Allowed IPs** must therefore include `10.0.0.0/8,172.16.0.0/12` (besides your own address); otherwise Coolify answers 403 "You are not allowed to access the API." before even checking the token, and the rebuild box shows that error for every site.
+
 ## Run locally
 
 ```bash
