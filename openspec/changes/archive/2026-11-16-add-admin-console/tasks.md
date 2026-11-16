@@ -48,7 +48,7 @@
 
 ## 7. Deployment
 
-- [ ] 7.1 Create the view-only Umami user for the console and add `<CONSOLE_URL>/auth/google/callback` to the Google OAuth client; verify a login with that user returns a token and a sign-in reaches the callback
-- [ ] 7.2 Release the comments service with `CONSOLE_TOKEN` and `CONSOLE_URL` set; verify `/api/admin/v1/summary` answers with the token and 401 without, and `/admin` shows the notice
-- [ ] 7.3 Create the Coolify application `console` (project `astro-common`, domain `console.babelcoach.com`, Dockerfile build, port 4340, health check `/healthz`) with its variables, and deploy; verify sign-in, publishing and refusing a test comment, the rebuild box, and the Visits totals against Umami's own dashboard for the same range
+- [x] 7.1 Create the view-only Umami user for the console and add `<CONSOLE_URL>/auth/google/callback` to the Google OAuth client; verify a login with that user returns a token and a sign-in reaches the callback
+- [x] 7.2 Release the comments service with `CONSOLE_TOKEN` and `CONSOLE_URL` set; verify `/api/admin/v1/summary` answers with the token and 401 without, and `/admin` shows the notice
+- [x] 7.3 Create the Coolify application `console` (project `astro-common`, domain `console.babelcoach.com`, Dockerfile build, port 4340, health check `/healthz`) with its variables, and deploy; verify sign-in, publishing and refusing a test comment, the rebuild box, and the Visits totals against Umami's own dashboard for the same range
 - [x] 7.4 Note for the four site repositories: point the admin menu's "Comments" link to `https://console.babelcoach.com/comments?site=<id>` (done in each repository, outside this change); verify the note is in the console README

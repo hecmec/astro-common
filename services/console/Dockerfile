@@ -27,6 +27,7 @@ RUN pnpm install --frozen-lockfile --prod --filter @babelcoach/console
 
 FROM node:26-alpine
 # HOST '::' listens on IPv6 and IPv4: in the image "localhost" is ::1 (Coolify's health check).
+# Coolify injects HOST=0.0.0.0, so the app also needs HOST=:: in its Coolify variables.
 ENV NODE_ENV=production PORT=4340 HOST=::
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules

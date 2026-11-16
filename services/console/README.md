@@ -60,12 +60,13 @@ Add `UMAMI_URL`, `UMAMI_USERNAME` and `UMAMI_PASSWORD` to see real visits.
 
 ## Deploy (Coolify)
 
-Coolify project `astro-common`, environment `production`, application `console`, from `hecmec/astro-common` branch `main`, auto-deploy on push. Domain `console.babelcoach.com` (covered by the `*.babelcoach.com` wildcard).
+Live at https://console.babelcoach.com: Coolify project `astro-common`, environment `production`, application `console`, from `hecmec/astro-common` branch `main`, auto-deploy on push. Domain `console.babelcoach.com` (covered by the `*.babelcoach.com` wildcard).
 
 - Build pack Dockerfile, file `services/console/Dockerfile`, build context the repository root, port 4340.
 - Health check `/healthz` on port 4340 (the server listens on IPv6 and IPv4).
 - No volume: the console keeps no data.
-- Runtime variables: `CONSOLE_URL`, `COMMENTS_API_URL`, `CONSOLE_TOKEN`, `UMAMI_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS`, `SESSION_SECRET`.
+- Runtime variables: `CONSOLE_URL`, `COMMENTS_API_URL`, `CONSOLE_TOKEN`, `UMAMI_URL`, `UMAMI_USERNAME`, `UMAMI_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS`, `SESSION_SECRET`, and **`HOST=::`**. Coolify injects `HOST=0.0.0.0` into every application, which overrides the image's `HOST=::`: the server then listens on IPv4 only, `localhost` (`::1` in the image) refuses the health check and Coolify rolls the deployment back.
+- Application uuid `scsh0dmgyxiqxcxqipkdwnrl`.
 - On the `comments` application: the same `CONSOLE_TOKEN`, and `CONSOLE_URL` so the new-comment email links here.
 
 The image is about 300 MB: Astro and Vite come with the production dependencies the server needs.
@@ -85,7 +86,7 @@ The "Comments ↗" link of each site's admin menu should open the console filter
 
 | Package | Why |
 | --- | --- |
-| `astro`, `@astrojs/node` | Server rendering and the Node server (approved in the `add-admin-console` change) |
+| `astro`, `@astrojs/node` | Server rendering and the Node server (approved in the `add-admin-console` change, archived as `openspec/changes/archive/2026-11-16-add-admin-console`) |
 | `zod`, `yaml` | Validation of `sites.yaml` (as in the comments service) |
 | `@babelcoach/google-auth` | Workspace package, bundled into the build |
 
