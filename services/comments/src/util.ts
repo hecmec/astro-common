@@ -8,10 +8,6 @@ export function sha256(value: string): string {
   return createHash('sha256').update(value).digest('hex');
 }
 
-export function pkceChallenge(verifier: string): string {
-  return createHash('sha256').update(verifier).digest('base64url');
-}
-
 /**
  * Normalises a page path: removes index.html, collapses repeated slashes and
  * adds a missing trailing slash. Returns null for anything that is not a path.

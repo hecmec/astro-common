@@ -11,7 +11,8 @@
     "check": "pnpm -r run check",
     "test": "pnpm -r run test",
     "dev": "pnpm --filter @babelcoach/comments-widget run build && pnpm --filter @babelcoach/comments-service run dev",
-    "test:e2e": "pnpm --filter @babelcoach/comments-service run test:e2e"
+    "test:e2e": "pnpm --filter @babelcoach/comments-service run test:e2e && pnpm --filter @babelcoach/console run test:e2e",
+    "dev:console": "pnpm --filter @babelcoach/console run dev"
   },
   "devDependencies": {
     "@types/node": "26.6.6",

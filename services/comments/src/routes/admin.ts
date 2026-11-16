@@ -3,6 +3,7 @@ import { deleteCookie, getCookie } from 'hono/cookie';
 import { html, raw } from 'hono/html';
 import type { Deps } from '../context.ts';
 import { layout } from '../pages.ts';
+import { pageUrl as sitePageUrl } from '../sites.ts';
 import {
   ADMIN_SITE,
   MAX_COMMENTS_PER_PAGE,
@@ -30,10 +31,7 @@ export function adminRoutes(deps: Deps): Hono<Env> {
   const { config, sites, db, now } = deps;
   const app = new Hono<Env>();
 
-  const pageUrl = (siteId: string, path: string) => {
-    const domain = sites.get(siteId)?.domains[0];
-    return domain ? `https://${domain}${path}` : path;
-  };
+  const pageUrl = (siteId: string, path: string) => sitePageUrl(sites, siteId, path);
 
   app.get('/login', (c) => {
     const flow = createFlow(db, { kind: 'admin', siteId: ADMIN_SITE, origin: config.baseUrl, lang: 'en' }, now());
@@ -117,6 +115,11 @@ export function adminRoutes(deps: Deps): Hono<Env> {
             <h1>Comments</h1>
             <form method="post" action="/admin/logout"><button class="btn small secondary">Sign out</button></form>
           </div>
+          ${
+            config.consoleUrl
+              ? html`<p class="notice" data-console-notice>Moderation has moved to the admin console: <a href="${`${config.consoleUrl}/comments`}">open the Comments page</a>. This page stays as a fallback for now.</p>`
+              : ''
+          }
           <nav class="tabs" aria-label="Status">
             ${STATUSES.map(
               (s) => html`<a href="${tabUrl(s)}" class="tab" ${s === status ? raw('aria-current="page"') : ''}>${s[0]!.toUpperCase() + s.slice(1)} <span class="count">${counts[s]}</span></a>`,

@@ -1,0 +1,13 @@
+{
+  "name": "@babelcoach/google-auth",
+  "private": true,
+  "type": "module",
+  "description": "Google sign-in (authorization code flow with PKCE) shared by the comments service and the console.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc -p .",
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,41 @@
+# Sites shown in the console. Ids must be exactly those of services/comments/sites.yaml
+# (a test checks it). Changing this file needs a rebuild of the console (it is bundled).
+#
+# `color`: the site's colour in every chart and badge, one step per theme. The four are
+# slots 1-4 of a categorical palette validated for colour-vision deficiencies; keep this
+# order (adjacent entries are the pairs checked) and run the console tests after a change.
+# `umami`: the Umami website id (stats.babelcoach.com).
+# `search_console`: the Search Console property (used by a later change).
+
+sites:
+  anglais-gratuit:
+    name: Anglais gratuit
+    short: AG
+    domain: www.anglais-gratuit.org
+    color: { light: "#2a78d6", dark: "#3987e5" }
+    umami: e758235d-249c-42fb-829e-8a8c9ffc09a0
+    search_console: sc-domain:anglais-gratuit.org
+
+  simplygoodfood:
+    name: Simply Good Food
+    short: SGF
+    domain: www.simplygoodfood.eu
+    color: { light: "#eb6834", dark: "#d95926" }
+    umami: ff436440-cb62-48ea-a15a-780d6a61e9c3
+    search_console: sc-domain:simplygoodfood.eu
+
+  alt-web:
+    name: Alt Web
+    short: AW
+    domain: www.alt-web.org
+    color: { light: "#1baf7a", dark: "#199e70" }
+    umami: c75ecd49-004b-4d68-a67a-f72d5d5d367d
+    search_console: sc-domain:alt-web.org
+
+  bonetgratuit:
+    name: Bon et gratuit
+    short: BG
+    domain: www.bon-et-gratuit.fr
+    color: { light: "#eda100", dark: "#c98500" }
+    umami: e1100d32-1ea8-418b-81b7-f38a9612b5f5
+    search_console: sc-domain:bon-et-gratuit.fr

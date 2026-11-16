@@ -164,6 +164,28 @@ describe('notifications', () => {
     expect(await notifier.tick()).toBe(true);
     expect(s.mailer.sent[1]!.subject).toBe('1 new comment to moderate');
   });
+
+  it('link to the console when its address is configured', async () => {
+    const s = setup();
+    const notifier = new Notifier({ db: s.db, mailer: s.mailer, sites: s.sites, adminEmail: ADMIN, baseUrl: BASE, consoleUrl: 'https://console.test', now: s.now });
+    const { token } = s.reader('ana@example.org');
+    await post(s, token, 'first');
+    s.advance(6 * 60 * 60 * 1000);
+    expect(await notifier.tick()).toBe(true);
+    expect(s.mailer.sent[0]!.text).toContain('Moderate: https://console.test/comments\n');
+    expect(s.mailer.sent[0]!.text).not.toContain('/admin');
+  });
+});
+
+describe('admin page and the console', () => {
+  it('shows a notice linking to the console only when its address is configured', async () => {
+    const without = await (await admin(setup({ devMode: true }))).get('/admin');
+    expect(await without.text()).not.toContain('data-console-notice');
+    const s = setup({ devMode: true, consoleUrl: 'https://console.test' });
+    const html = await (await (await admin(s)).get('/admin')).text();
+    expect(html).toContain('data-console-notice');
+    expect(html).toContain('href="https://console.test/comments"');
+  });
 });
 
 describe('sticky comments and the per-page limit', () => {

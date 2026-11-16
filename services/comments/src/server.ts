@@ -2,12 +2,12 @@ import { serve } from '@hono/node-server';
 import { createApp } from './app.ts';
 import { loadConfig } from './config.ts';
 import { openDb } from './db.ts';
-import { googleProvider } from './google.ts';
+import { googleProvider } from '@babelcoach/google-auth';
 import { createMailer } from './mailer.ts';
 import { Notifier } from './notify.ts';
 import { Rebuilder, coolifyDeployer } from './rebuild.ts';
 import { loadSites } from './sites.ts';
-import {  MINUTE, systemClock } from './util.ts';
+import { MINUTE, systemClock } from './util.ts';
 
 const config = loadConfig();
 const sites = loadSites(config.sitesFile, { allowDevOrigins: config.allowDevOrigins });
@@ -16,7 +16,7 @@ const mailer = createMailer(config.smtpUrl, config.mailFrom);
 const google =
   config.googleClientId && config.googleClientSecret ? googleProvider(config.googleClientId, config.googleClientSecret) : undefined;
 
-const notifier = new Notifier({ db, mailer, sites, adminEmail: config.adminEmail, baseUrl: config.baseUrl, now: systemClock });
+const notifier = new Notifier({ db, mailer, sites, adminEmail: config.adminEmail, baseUrl: config.baseUrl, consoleUrl: config.consoleUrl, now: systemClock });
 const tick = () => notifier.tick().catch((err) => console.error('Notification failed:', err));
 const timer = setInterval(tick, 15 * MINUTE);
 
@@ -41,6 +41,7 @@ const server = serve({ fetch: app.fetch, port: config.port, hostname: '::' }, (i
       ? `Nightly rebuild at ${config.rebuildAt} Europe/Paris for: ${rebuilder.configuredSites().map((s) => s.id).join(', ') || 'no site (none has rebuild.coolify_app)'}`
       : 'Nightly rebuild is off (COOLIFY_API_URL / COOLIFY_DEPLOY_TOKEN not set).',
   );
+  console.log(config.consoleToken ? 'Admin API for the console is on.' : 'Admin API is off (CONSOLE_TOKEN not set).');
   if (config.devMode) console.log('DEV_MODE: the popup offers a sign-in without any check.');
 });
 

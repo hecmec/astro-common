@@ -1,0 +1,83 @@
+---
+// Comments page (spec comment-moderation): status tabs with counts, site and page filters
+// in the query string, one card per comment, the site rebuilds.
+import CommentCard from '../../components/CommentCard.astro';
+import RebuildBox from '../../components/RebuildBox.astro';
+import Console from '../../layouts/Console.astro';
+import { type AdminComment, type Counts, type Rebuilds, STATUSES, type Status } from '../../lib/comments-api.ts';
+import { getContext } from '../../lib/context.ts';
+import { NOTICES, filtersQuery, parseFilters } from '../../lib/filters.ts';
+import { siteById } from '../../lib/sites.ts';
+
+const { comments: api, sites } = getContext();
+const filters = parseFilters(Astro.url.searchParams, sites);
+const back = filtersQuery(filters);
+const notice = NOTICES[Astro.url.searchParams.get('notice') ?? ''];
+
+let list: { comments: AdminComment[]; counts: Counts } | null = null;
+let pending: number | null = null;
+let rebuilds: Rebuilds | null = null;
+const [listResult, summaryResult, rebuildsResult] = await Promise.allSettled([api.comments(filters), api.summary(), api.rebuilds()]);
+if (listResult.status === 'fulfilled') list = listResult.value;
+else console.error('Comments list unavailable:', listResult.reason instanceof Error ? listResult.reason.message : listResult.reason);
+if (summaryResult.status === 'fulfilled') pending = summaryResult.value.all.pending;
+if (rebuildsResult.status === 'fulfilled') rebuilds = rebuildsResult.value;
+if (!list) Astro.response.status = 503;
+
+const label = (s: Status) => s[0]!.toUpperCase() + s.slice(1);
+const tabUrl = (s: Status) => `/comments?${filtersQuery({ ...filters, status: s })}`;
+const scope = [filters.site ? siteById(sites, filters.site)!.name : 'all sites', filters.path].filter(Boolean).join(', ');
+---
+
+<Console title="Comments" current="comments" pending={pending}>
+  <h1 class="mb-4 text-2xl font-bold">Comments</h1>
+
+  {notice && <p class:list={['notice mb-4', notice.error && 'notice-error']} role="status" data-notice>{notice.text}</p>}
+
+  <nav class="mb-4 flex flex-wrap gap-1 border-b border-(--line)" aria-label="Status">
+    {
+      STATUSES.map((s) => (
+        <a
+          href={tabUrl(s)}
+          class:list={['-mb-px border-b-2 px-3 py-2 text-sm font-medium', s === filters.status ? 'border-(--fg)' : 'border-transparent text-(--fg-soft) hover:text-(--fg)']}
+          aria-current={s === filters.status ? 'page' : undefined}
+          data-tab={s}
+        >
+          {label(s)}
+          {list && <span class="ml-1 rounded-full bg-(--bg) px-1.5 text-xs" data-count>{list.counts[s]}</span>}
+        </a>
+      ))
+    }
+  </nav>
+
+  <form method="get" action="/comments" class="mb-6 flex flex-wrap items-center gap-2" data-filters>
+    <input type="hidden" name="status" value={filters.status} />
+    <select name="site" class="field" aria-label="Site">
+      <option value="">All sites</option>
+      {sites.map((s) => <option value={s.id} selected={s.id === filters.site}>{s.name}</option>)}
+    </select>
+    <input name="path" type="text" class="field w-64" placeholder="/page/path/ (optional)" value={filters.path ?? ''} aria-label="Page path" autocomplete="off" />
+    <button class="btn btn-secondary">Apply</button>
+    {(filters.site || filters.path) && <a href={`/comments?status=${filters.status}`} class="text-sm text-(--fg-soft) underline">Clear filters</a>}
+  </form>
+
+  {
+    !list ? (
+      <p class="notice notice-error" role="alert" data-unavailable>
+        The comments service is unavailable. The list cannot be shown; try again in a moment.
+      </p>
+    ) : list.comments.length === 0 ? (
+      <p class="notice" data-empty>
+        No {filters.status} comments for {scope}.
+      </p>
+    ) : (
+      <div class="flex flex-col gap-3">
+        {list.comments.map((c) => (
+          <CommentCard comment={c} site={siteById(sites, c.site)} back={back} />
+        ))}
+      </div>
+    )
+  }
+
+  <RebuildBox rebuilds={rebuilds} back={back} />
+</Console>

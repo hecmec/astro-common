@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
 import type { Config } from './config.ts';
 import type { DB } from './db.ts';
-import type { GoogleProvider } from './google.ts';
+import type { GoogleProvider } from '@babelcoach/google-auth';
 import type { Mailer } from './mailer.ts';
 import type { Rebuilder } from './rebuild.ts';
 import { RateLimiter } from './ratelimit.ts';

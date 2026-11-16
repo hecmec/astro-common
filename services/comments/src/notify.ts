@@ -16,16 +16,17 @@ export class Notifier {
   private readonly mailer: Mailer;
   private readonly sites: Sites;
   private readonly adminEmail: string;
-  private readonly baseUrl: string;
+  private readonly moderateUrl: string;
   private readonly now: Clock;
   private running = false;
 
-  constructor(p: { db: DB; mailer: Mailer; sites: Sites; adminEmail: string; baseUrl: string; now: Clock }) {
+  /** `consoleUrl`: the admin console; the mail links to its Comments page, else to this service's /admin. */
+  constructor(p: { db: DB; mailer: Mailer; sites: Sites; adminEmail: string; baseUrl: string; consoleUrl?: string; now: Clock }) {
     this.db = p.db;
     this.mailer = p.mailer;
     this.sites = p.sites;
     this.adminEmail = p.adminEmail;
-    this.baseUrl = p.baseUrl;
+    this.moderateUrl = p.consoleUrl ? `${p.consoleUrl}/comments` : `${p.baseUrl}/admin`;
     this.now = p.now;
   }
 
@@ -47,7 +48,7 @@ export class Notifier {
       await this.mailer.send({
         to: this.adminEmail,
         subject: `${rows.length} new comment${rows.length > 1 ? 's' : ''} to moderate`,
-        text: `${lines.join('\n\n')}\n\nModerate: ${this.baseUrl}/admin\n`,
+        text: `${lines.join('\n\n')}\n\nModerate: ${this.moderateUrl}\n`,
       });
       setMeta(this.db, KEY, String(rows.at(-1)!.created_at));
       return true;

@@ -1,0 +1,96 @@
+---
+// Frame of every signed-in console page: the left menu (spec admin-console, "Feature menu")
+// and the site colours as CSS variables (--site-<id>), one step per theme.
+import '../styles/global.css';
+import { getContext } from '../lib/context.ts';
+
+interface Props {
+  title: string;
+  current: 'comments' | 'visits';
+  /** Pending comments of all sites, when the page already has them; else fetched here. */
+  pending?: number | null;
+}
+
+const { title, current } = Astro.props;
+const { comments, sites } = getContext();
+let pending = Astro.props.pending;
+if (pending === undefined) {
+  try {
+    pending = (await comments.summary()).all.pending;
+  } catch {
+    pending = null; // service down: the entry shows no number
+  }
+}
+
+const siteColors = [
+  `:root{${sites.map((s) => `--site-${s.id}:${s.color.light};`).join('')}}`,
+  `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${sites.map((s) => `--site-${s.id}:${s.color.dark};`).join('')}}}`,
+  `:root[data-theme="dark"]{${sites.map((s) => `--site-${s.id}:${s.color.dark};`).join('')}}`,
+].join('\n');
+
+const menu = [
+  { id: 'comments', href: '/comments', label: 'Comments', count: pending },
+  { id: 'visits', href: '/visits', label: 'Visits', count: null },
+] as const;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · BabelCoach console</title>
+    <style set:html={siteColors}></style>
+  </head>
+  <body class="min-h-screen">
+    <div class="md:flex md:min-h-screen">
+      <aside class="flex flex-col border-b border-(--line) bg-(--surface) md:w-56 md:flex-none md:border-r md:border-b-0">
+        <!-- Narrow screens: the menu folds behind this checkbox (works without scripts). -->
+        <input type="checkbox" id="menu-toggle" class="peer sr-only" />
+        <div class="flex items-center justify-between px-4 py-3">
+          <a href="/comments" class="font-bold">BabelCoach console</a>
+          <label for="menu-toggle" class="btn btn-secondary md:hidden" aria-label="Menu">Menu</label>
+        </div>
+        <div class="hidden flex-1 flex-col gap-4 px-2 pb-4 peer-checked:flex md:flex" data-menu>
+          <nav aria-label="Features">
+            <ul class="flex flex-col gap-1">
+              {
+                menu.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class:list={[
+                        'flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-(--bg)',
+                        item.id === current && 'bg-(--bg)',
+                      ]}
+                      aria-current={item.id === current ? 'page' : undefined}
+                      data-menu-item={item.id}
+                    >
+                      <span>{item.label}</span>
+                      {item.count ? (
+                        <span class="rounded-full bg-(--btn) px-2 text-xs font-bold text-(--btn-fg)" data-pending>
+                          {item.count}
+                        </span>
+                      ) : null}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+          <div class="mt-auto border-t border-(--line) px-3 pt-3 text-sm">
+            <p class="truncate text-(--fg-soft)" data-account>{Astro.locals.email}</p>
+            <form method="post" action="/logout" class="mt-2">
+              <button class="btn btn-secondary">Sign out</button>
+            </form>
+          </div>
+        </div>
+      </aside>
+      <main class="min-w-0 flex-1 px-4 py-6 md:px-8">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

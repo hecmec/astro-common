@@ -19,6 +19,8 @@ Readers of the BabelCoach sites sign in (Google or an email link), comment on a 
 | `TRUST_PROXY` | `true` behind Coolify's proxy, so rate limits see the real client IP |
 | `COOLIFY_API_URL`, `COOLIFY_DEPLOY_TOKEN` | Nightly rebuild of the sites (below): Coolify's URL (`https://coolify.babelcoach.com`) and a token allowed to deploy the sites' production apps. Without them the rebuild is off |
 | `REBUILD_AT` | Local time of the nightly rebuild check, Europe/Paris, `HH:MM` (default `03:30`) |
+| `CONSOLE_TOKEN` | Shared secret of the [admin console](../console) (at least 32 characters, e.g. `openssl rand -base64 36`). Without it the admin API is off (404). Same value on the console |
+| `CONSOLE_URL` | The console's public URL, e.g. `https://console.babelcoach.com`: the new-comment email links to its Comments page and `/admin` shows a notice pointing there. Without it the email links to `/admin` |
 | `PORT` | Default 4330 |
 | `ALLOW_DEV_ORIGINS`, `DEV_MODE` | Development only (refused when `NODE_ENV=production`): accept `dev_origins` from `sites.yaml`; offer a sign-in without any check |
 
@@ -48,8 +50,22 @@ A site's dev server (e.g. alt-web on :4325) can then embed the widget with `data
 | `PUT /api/v1/sites/:site/reactions` | Toggle a reaction |
 | `GET/PUT/DELETE /api/v1/sites/:site/me`, `POST …/logout` | Display name, account deletion, sign-out |
 | `GET /api/v1/sites/:site/export` | Published comments older than `bake_after_days`, for site builds |
-| `/admin` | Moderation |
+| `/api/admin/v1/...` | Admin API for the console (below) |
+| `/admin` | Moderation (fallback while the console settles in) |
 | `GET /healthz` | Health check |
+
+## Admin API
+
+Called only by the console's server, with `Authorization: Bearer <CONSOLE_TOKEN>` (401 otherwise, 404 everywhere when the token is not set). No CORS headers: browsers cannot call it from a page. Each action has the same effect as on `/admin`. JSON in and out.
+
+| | |
+| --- | --- |
+| `GET /api/admin/v1/summary` | `{ sites: { <id>: { name, pending, published, refused } }, all: { pending, published, refused } }` |
+| `GET /api/admin/v1/comments?status=&site=&path=` | `{ comments: [...], counts }`; status `pending` (default, oldest first), `published` or `refused` (newest first); 400 on an unknown site, status or invalid path. Each comment: `id, site, path, url, lang, status, created_at, published_at, author, email, user_id, blocked, sticky, body, reply` |
+| `POST /api/admin/v1/comments/:id/{publish,refuse,sticky,unsticky}` | `{ comment }`; 404 unknown comment; 409 for `sticky` on a comment that is not published |
+| `PUT /api/admin/v1/comments/:id/reply` | Body `{ "body": "..." }`, empty or `null` removes the reply; `{ comment }`; 409 for a reply to a comment that is not published |
+| `POST /api/admin/v1/users/:id/{block,unblock}` | `{ user: { id, blocked } }`; blocking refuses the reader's pending comments |
+| `GET /api/admin/v1/rebuilds`, `POST …/rebuilds` | `{ enabled: false }` or `{ enabled: true, at, timezone, sites: [{ id, name, status }] }`; POST runs the check for all sites first |
 
 ## Deploy (Coolify)
 
@@ -62,7 +78,7 @@ Settings:
 - Build pack Dockerfile, file `services/comments/Dockerfile`, build context the repository root, port 4330.
 - Health check `/healthz` on port 4330 (the service listens on IPv6 and IPv4: in the image `localhost` is `::1`).
 - Persistent volume on `/data`.
-- Runtime variables: `BASE_URL`, `ADMIN_EMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SMTP_URL`, `MAIL_FROM`, `TRUST_PROXY=true`.
+- Runtime variables: `BASE_URL`, `ADMIN_EMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SMTP_URL`, `MAIL_FROM`, `TRUST_PROXY=true`, `CONSOLE_TOKEN`, `CONSOLE_URL`.
 - The mail sender's domain needs SPF, DKIM and DMARC, or sign-in links land in spam.
 
 ## Backups and restore
@@ -80,4 +96,4 @@ To restore: stop the service, replace `/data/comments.db` with the backup and de
 | `yaml` | Reading `sites.yaml` |
 | `nodemailer` | Sending sign-in links and admin notifications over SMTP |
 
-SQLite is Node's built-in `node:sqlite`; Google sign-in uses `fetch` (no OIDC library).
+SQLite is Node's built-in `node:sqlite`. Google sign-in is the workspace package [`@babelcoach/google-auth`](../../packages/google-auth), shared with the console: plain `fetch`, no OIDC library.

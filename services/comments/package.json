@@ -11,6 +11,7 @@
     "backup": "node src/backup.ts"
   },
   "dependencies": {
+    "@babelcoach/google-auth": "workspace:*",
     "@hono/node-server": "2.1.6",
     "hono": "4.13.16",
     "nodemailer": "10.3.1",

@@ -1,0 +1,49 @@
+---
+// Site rebuild status and the "Rebuild changed sites now" button (spec site-rebuild).
+import type { Rebuilds } from '../lib/comments-api.ts';
+import { parisDateTime } from '../lib/dates.ts';
+
+interface Props {
+  rebuilds: Rebuilds | null;
+  back: string;
+}
+const { rebuilds, back } = Astro.props;
+const what = (s: NonNullable<Extract<Rebuilds, { enabled: true }>['sites'][number]['status']>) =>
+  s.result === 'requested' ? 'rebuild requested' : s.result === 'unchanged' ? 'unchanged, no rebuild' : `failed: ${s.error ?? 'unknown error'}`;
+---
+
+<section class="card mt-8" data-rebuilds aria-labelledby="rebuilds-title">
+  {
+    rebuilds === null ? (
+      <p class="text-sm text-(--fg-soft)">
+        <strong id="rebuilds-title">Site rebuilds</strong>: status unavailable.
+      </p>
+    ) : !rebuilds.enabled ? (
+      <p class="text-sm text-(--fg-soft)" data-rebuilds-off>
+        <strong id="rebuilds-title">Site rebuilds</strong>: off (the comments service has no Coolify settings).
+      </p>
+    ) : (
+      <>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="rebuilds-title" class="font-semibold">
+            Site rebuilds
+          </h2>
+          <form method="post" action="/rebuilds">
+            <input type="hidden" name="back" value={back} />
+            <button class="btn btn-secondary">Rebuild changed sites now</button>
+          </form>
+        </div>
+        <p class="mt-1 text-sm text-(--fg-soft)">
+          Every night at {rebuilds.at} ({rebuilds.timezone}), sites whose baked comments or reactions changed are rebuilt.
+        </p>
+        <ul class="mt-2 text-sm">
+          {rebuilds.sites.map((s) => (
+            <li data-rebuild-site={s.id}>
+              {s.name}: {s.status ? `${parisDateTime(s.status.checked_at)} · ${what(s.status)}` : 'never checked'}
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+</section>

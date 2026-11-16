@@ -19,7 +19,8 @@ import {
   takeFlowToken,
   useLoginLink,
 } from '../store.ts';
-import { EMAIL_RE, pkceChallenge, randomToken } from '../util.ts';
+import { pkceChallenge } from '@babelcoach/google-auth';
+import { EMAIL_RE, randomToken } from '../util.ts';
 
 export const ADMIN_COOKIE = 'bc_admin';
 

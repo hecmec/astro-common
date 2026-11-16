@@ -1,0 +1,53 @@
+---
+// Sign-in page (spec admin-console): Google, plus a dev sign-in in DEV_MODE.
+import '../styles/global.css';
+import { signInError } from '../lib/auth.ts';
+import { getContext } from '../lib/context.ts';
+import { safeNext } from '../lib/session.ts';
+
+const { config, google } = getContext();
+const next = safeNext(Astro.url.searchParams.get('next'));
+const error = signInError(Astro.url.searchParams.get('error'), Astro.url.searchParams.get('email'));
+// Already signed in (the middleware reads the session on public pages too).
+if (Astro.locals.email && !error) return Astro.redirect(next, 302);
+if (error) Astro.response.status = error.status;
+const googleHref = `/auth/google?${new URLSearchParams({ next })}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Sign in · BabelCoach console</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center px-4">
+    <main class="card w-full max-w-sm">
+      <h1 class="mb-4 text-xl font-bold">BabelCoach console</h1>
+      {error && <p class="notice notice-error mb-4" role="alert" data-error>{error.message}</p>}
+      {
+        google ? (
+          <a class="btn" href={googleHref}>
+            Sign in with Google
+          </a>
+        ) : (
+          <p class="notice">Google sign-in is not configured.</p>
+        )
+      }
+      {
+        config.devMode && !config.production && (
+          <form method="post" action="/auth/dev" class="mt-6 flex flex-col gap-2 border-t border-(--line) pt-4">
+            <label for="dev-email" class="text-sm text-(--fg-soft)">
+              Dev sign-in (no Google check)
+            </label>
+            <input type="hidden" name="next" value={next} />
+            <input id="dev-email" name="email" type="email" required class="field" value={config.adminEmails[0] ?? ''} />
+            <button class="btn btn-danger self-start">Dev sign-in</button>
+          </form>
+        )
+      }
+    </main>
+  </body>
+</html>

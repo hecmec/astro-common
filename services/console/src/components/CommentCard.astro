@@ -1,0 +1,79 @@
+---
+// One comment with its moderation actions, as plain POST forms (spec comment-moderation).
+import type { AdminComment } from '../lib/comments-api.ts';
+import { parisDateTime } from '../lib/dates.ts';
+import type { Site } from '../lib/sites.ts';
+import SiteBadge from './SiteBadge.astro';
+
+interface Props {
+  comment: AdminComment;
+  site: Site | undefined;
+  /** Query string of the current list, so actions come back to it. */
+  back: string;
+}
+const { comment: c, site, back } = Astro.props;
+const action = (name: string) => `/comments/${c.id}/${name}`;
+---
+
+<article class="card flex flex-col gap-3" data-comment={c.id}>
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-(--fg-soft)">
+    <SiteBadge site={site} fallback={c.site} />
+    <a href={c.url} target="_blank" rel="noopener" class="underline decoration-(--line) underline-offset-2 hover:decoration-current">{c.path}</a>
+    <span>{c.lang}</span>
+    <time datetime={c.created_at}>{parisDateTime(c.created_at)}</time>
+    <span>
+      {c.author ?? 'Former reader'}{c.email && <> &lt;{c.email}&gt;</>}
+    </span>
+    {c.blocked && <span class="rounded border border-(--danger) px-1.5 text-xs text-(--danger)">blocked</span>}
+    {c.sticky && <span class="rounded border border-(--line) px-1.5 text-xs">sticky</span>}
+  </div>
+  <p class="whitespace-pre-wrap break-words">{c.body}</p>
+  <div class="flex flex-wrap gap-2">
+    {
+      c.status !== 'published' && (
+        <form method="post" action={action('publish')}>
+          <input type="hidden" name="back" value={back} />
+          <button class="btn">Publish</button>
+        </form>
+      )
+    }
+    {
+      c.status === 'published' && (
+        <form method="post" action={action(c.sticky ? 'unsticky' : 'sticky')}>
+          <input type="hidden" name="back" value={back} />
+          <button class="btn btn-secondary" title="A sticky comment keeps its place and is never cut when its page has more than 300 comments">
+            {c.sticky ? 'Remove sticky' : 'Make sticky'}
+          </button>
+        </form>
+      )
+    }
+    {
+      c.status !== 'refused' && (
+        <form method="post" action={action('refuse')}>
+          <input type="hidden" name="back" value={back} />
+          <button class="btn btn-danger">{c.status === 'published' ? 'Unpublish' : 'Refuse'}</button>
+        </form>
+      )
+    }
+    {
+      c.user_id && (
+        <form method="post" action={`/users/${c.user_id}/${c.blocked ? 'unblock' : 'block'}`}>
+          <input type="hidden" name="back" value={back} />
+          <button class="btn btn-secondary">{c.blocked ? 'Unblock reader' : 'Block reader'}</button>
+        </form>
+      )
+    }
+  </div>
+  {
+    c.status === 'published' && (
+      <form method="post" action={action('reply')} class="flex flex-col gap-2 border-t border-(--line) pt-3">
+        <input type="hidden" name="back" value={back} />
+        <label for={`reply-${c.id}`} class="text-sm text-(--fg-soft)">
+          Public reply{c.reply ? '' : ' (none yet)'}
+        </label>
+        <textarea id={`reply-${c.id}`} name="body" rows="2" maxlength="2000" class="field">{c.reply?.body ?? ''}</textarea>
+        <button class="btn btn-secondary self-start">Save reply</button>
+      </form>
+    )
+  }
+</article>

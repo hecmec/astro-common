@@ -10,6 +10,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY services/comments/package.json services/comments/
 COPY packages/comments-widget/package.json packages/comments-widget/
 COPY packages/astro-comments/package.json packages/astro-comments/
+COPY packages/google-auth/package.json packages/google-auth/
 
 # Widget bundle (needs esbuild, a dev dependency)
 FROM base AS widget
@@ -28,6 +29,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/services/comments/node_modules ./services/comments/node_modules
 COPY services/comments/package.json services/comments/sites.yaml services/comments/
+COPY packages/google-auth/package.json packages/google-auth/
+COPY packages/google-auth/src packages/google-auth/src
 COPY services/comments/src services/comments/src
 COPY services/comments/public services/comments/public
 COPY --from=widget /app/services/comments/public/widget.js services/comments/public/widget.js

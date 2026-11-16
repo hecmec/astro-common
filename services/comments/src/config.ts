@@ -24,6 +24,10 @@ export interface Config {
   coolifyDeployToken?: string;
   /** Local time (Europe/Paris) of the nightly rebuild check, HH:MM. */
   rebuildAt: string;
+  /** Shared secret of the admin console; without it the admin API (/api/admin/v1) is off. */
+  consoleToken?: string;
+  /** Public URL of the admin console, without trailing slash: notification links and the /admin notice. */
+  consoleUrl?: string;
   port: number;
   production: boolean;
 }
@@ -49,6 +53,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     coolifyApiUrl: env.COOLIFY_API_URL ? env.COOLIFY_API_URL.replace(/\/+$/, '') : undefined,
     coolifyDeployToken: env.COOLIFY_DEPLOY_TOKEN || undefined,
     rebuildAt: env.REBUILD_AT ?? '03:30',
+    consoleToken: env.CONSOLE_TOKEN?.trim() || undefined,
+    consoleUrl: env.CONSOLE_URL?.trim() ? env.CONSOLE_URL.trim().replace(/\/+$/, '') : undefined,
     port,
     production,
   };
@@ -59,6 +65,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     if (!config.adminEmail) problems.push('ADMIN_EMAIL is required');
     if (config.allowDevOrigins) problems.push('ALLOW_DEV_ORIGINS is not allowed in production');
     if (config.devMode) problems.push('DEV_MODE is not allowed in production');
+    if (config.consoleUrl && !config.consoleUrl.startsWith('https://')) problems.push('CONSOLE_URL must be an https URL');
+    if (config.consoleToken && config.consoleToken.length < 32) problems.push('CONSOLE_TOKEN must be at least 32 characters');
     if (problems.length) throw new Error(`Invalid configuration:\n- ${problems.join('\n- ')}`);
   }
   return config;

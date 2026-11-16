@@ -1,9 +1,10 @@
 import { createApp } from '../src/app.ts';
 import type { Config } from '../src/config.ts';
-import { openDb } from '../src/db.ts';
-import type { GoogleProfile, GoogleProvider } from '../src/google.ts';
+import { type DB, openDb } from '../src/db.ts';
+import type { GoogleProfile, GoogleProvider } from '@babelcoach/google-auth';
 import { MemoryMailer } from '../src/mailer.ts';
-import { parseSites } from '../src/sites.ts';
+import type { Rebuilder } from '../src/rebuild.ts';
+import { type Sites, parseSites } from '../src/sites.ts';
 import { createSession, findOrCreateUser, setDisplayName } from '../src/store.ts';
 
 export const BASE = 'https://comments.test';
@@ -27,7 +28,9 @@ sites:
     bake_after_days: 3
 `;
 
-export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean; emailSignIn?: boolean } = {}) {
+export function setup(
+  opts: { google?: GoogleProfile | Error; devMode?: boolean; emailSignIn?: boolean; consoleToken?: string; consoleUrl?: string; rebuilder?: (d: { db: DB; sites: Sites; now: () => number }) => Rebuilder } = {},
+) {
   let time = Date.parse('2026-11-01T10:00:00Z');
   const now = () => time;
   const advance = (ms: number) => {
@@ -44,6 +47,8 @@ export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean;
     devMode: opts.devMode ?? false,
     trustProxy: true,
     rebuildAt: '03:30',
+    consoleToken: opts.consoleToken,
+    consoleUrl: opts.consoleUrl,
     port: 0,
     production: false,
   };
@@ -62,7 +67,8 @@ export function setup(opts: { google?: GoogleProfile | Error; devMode?: boolean;
     };
   }
   let newComments = 0;
-  const app = createApp({ config, sites, db, mailer, google, now, onNewComment: () => newComments++ });
+  const rebuilder = opts.rebuilder?.({ db, sites, now });
+  const app = createApp({ config, sites, db, mailer, google, now, rebuilder, onNewComment: () => newComments++ });
 
   /** A signed-in reader on a site, created directly in the database. */
   const reader = (email: string, siteId = 'alt-web', name: string | null = email.split('@')[0]!) => {

@@ -1,0 +1,111 @@
+---
+// Visits page (spec console-visits): the four sites in one chart, 7/30/90 days,
+// visitors or pageviews, totals as legend, a table view.
+import LineChart from '../components/LineChart.astro';
+import Console from '../layouts/Console.astro';
+import { formatNumber } from '../lib/chart.ts';
+import { getContext } from '../lib/context.ts';
+import { shortDay } from '../lib/dates.ts';
+import { METRICS, type Metric, RANGES, type Range, parseMetric, parseRange } from '../lib/visits.ts';
+
+const { visits } = getContext();
+const range = parseRange(Astro.url.searchParams.get('range'));
+const metric = parseMetric(Astro.url.searchParams.get('metric'));
+const data = await visits.get(range, metric);
+if (data.unavailable) Astro.response.status = 503;
+
+const UNITS: Record<Metric, [string, string]> = { visitors: ['visitor', 'visitors'], pageviews: ['pageview', 'pageviews'] };
+const LABELS: Record<Metric, string> = { visitors: 'Visitors', pageviews: 'Pageviews' };
+const href = (r: Range, m: Metric) => `/visits?${new URLSearchParams({ range: String(r), metric: m })}`;
+const chartInput = {
+  days: data.days,
+  unit: UNITS[metric],
+  series: data.series.map((s) => ({ id: s.site.id, name: s.site.name, short: s.site.short, color: `var(--site-${s.site.id})`, values: s.values })),
+};
+const title = `Daily ${metric} per site, last ${range} days (Europe/Paris)`;
+const pill = 'rounded-md px-3 py-1 text-sm font-medium';
+---
+
+<Console title="Visits" current="visits">
+  <h1 class="mb-4 text-2xl font-bold">Visits</h1>
+
+  <div class="mb-4 flex flex-wrap items-center gap-4" data-controls>
+    <nav class="flex gap-1 rounded-lg border border-(--line) bg-(--surface) p-1" aria-label="Range">
+      {
+        RANGES.map((r) => (
+          <a href={href(r, metric)} class:list={[pill, r === range ? 'bg-(--btn) text-(--btn-fg)' : 'hover:bg-(--bg)']} aria-current={r === range ? 'page' : undefined} data-range={r}>
+            {r} days
+          </a>
+        ))
+      }
+    </nav>
+    <nav class="flex gap-1 rounded-lg border border-(--line) bg-(--surface) p-1" aria-label="Metric">
+      {
+        METRICS.map((m) => (
+          <a href={href(range, m)} class:list={[pill, m === metric ? 'bg-(--btn) text-(--btn-fg)' : 'hover:bg-(--bg)']} aria-current={m === metric ? 'page' : undefined} data-metric={m}>
+            {LABELS[m]}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+
+  {
+    data.unavailable ? (
+      <p class="notice notice-error" role="alert" data-unavailable>
+        Visit statistics are unavailable.
+      </p>
+    ) : (
+      <>
+        {data.failed.length > 0 && (
+          <p class="notice notice-error mb-4" role="status" data-failed>
+            No statistics for {data.failed.map((s) => s.name).join(', ')} right now; the other sites are shown.
+          </p>
+        )}
+        <section class="card">
+          <LineChart input={chartInput} title={title} />
+          <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-(--line) pt-3 text-sm" aria-label={`Totals over ${range} days`} data-totals>
+            {data.series.map((s) => (
+              <li class="flex items-center gap-2" data-total={s.site.id}>
+                <span class="site-dot" style={`background: var(--site-${s.site.id})`} aria-hidden="true" />
+                <span class="text-(--fg-soft)">{s.site.name}</span>
+                <span class="font-semibold tabular-nums">{s.total === null ? 'unavailable' : formatNumber(s.total)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <p class="mt-3 text-sm text-(--fg-soft)" data-note>
+          {metric === 'visitors'
+            ? 'Visitors are Umami visits: a person counts once per visit, so the total over a period counts returning people again. Days are calendar days in Paris time; today is counted so far.'
+            : 'Pageviews are every page loaded on the site. Days are calendar days in Paris time; today is counted so far.'}{' '}
+          Figures are at most 5 minutes old.
+        </p>
+        <details class="mt-4" data-table>
+          <summary class="cursor-pointer text-sm font-medium">Show as table</summary>
+          <div class="mt-2 overflow-x-auto">
+            <table class="w-full text-sm tabular-nums">
+              <thead>
+                <tr class="border-b border-(--line) text-left">
+                  <th class="py-1 pr-4 font-medium">Day</th>
+                  {data.series.map((s) => <th class="py-1 pr-4 text-right font-medium">{s.site.name}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {data.days
+                  .map((d, i) => ({ d, i }))
+                  .reverse()
+                  .map(({ d, i }) => (
+                    <tr class="border-b border-(--line)">
+                      <td class="py-1 pr-4">{shortDay(d)}</td>
+                      {data.series.map((s) => <td class="py-1 pr-4 text-right">{s.values ? formatNumber(s.values[i]!) : '-'}</td>)}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </>
+    )
+  }
+  <script is:inline src="/chart.js" defer></script>
+</Console>

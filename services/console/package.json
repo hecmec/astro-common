@@ -1,0 +1,27 @@
+{
+  "name": "@babelcoach/console",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "DEV_MODE=true astro dev",
+    "build": "astro build",
+    "start": "node dist/server/entry.mjs",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:e2e": "astro build && playwright test"
+  },
+  "dependencies": {
+    "@astrojs/node": "11.1.11",
+    "@babelcoach/google-auth": "workspace:*",
+    "astro": "7.3.5",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "_source": "Shaped after Umami v3's source (getDateSQL: day buckets as 'YYYY-MM-DDT00:00:00Z', wall-clock in the requested timezone, literal Z). Replace with a response recorded from stats.babelcoach.com (task 5.1).",
+  "pageviews": [
+    { "x": "2026-11-14T00:00:00Z", "y": 120 },
+    { "x": "2026-11-15T00:00:00Z", "y": 98 },
+    { "x": "2026-11-16T00:00:00Z", "y": 41 }
+  ],
+  "sessions": [
+    { "x": "2026-11-14T00:00:00Z", "y": 37 },
+    { "x": "2026-11-16T00:00:00Z", "y": 12 }
+  ]
+}

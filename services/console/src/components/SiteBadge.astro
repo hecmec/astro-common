@@ -1,0 +1,15 @@
+---
+// A site's name with its colour dot (the text stays in the text colour; the dot carries the identity).
+import type { Site } from '../lib/sites.ts';
+
+interface Props {
+  site: Site | undefined;
+  fallback?: string;
+}
+const { site, fallback } = Astro.props;
+---
+
+<span class="inline-flex items-center gap-1.5 rounded-full border border-(--line) px-2 py-0.5 text-xs font-medium" data-site={site?.id}>
+  {site && <span class="site-dot" style={`background: var(--site-${site.id})`} aria-hidden="true" />}
+  {site?.name ?? fallback}
+</span>

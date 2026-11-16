@@ -7,3 +7,5 @@ data/
 services/comments/public/widget.js
 test-results/
 playwright-report/
+dist/
+.astro/

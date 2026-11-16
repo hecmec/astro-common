@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Hono } from 'hono';
 import { type Deps, createLimits } from './context.ts';
+import { adminApiRoutes } from './routes/admin-api.ts';
 import { adminRoutes } from './routes/admin.ts';
 import { apiRoutes } from './routes/api.ts';
 import { authRoutes } from './routes/auth.ts';
@@ -60,6 +61,7 @@ export function createApp(deps: Deps): Hono {
 
   app.route('/auth', authRoutes(deps, limits));
   app.route('/api/v1', apiRoutes(deps));
+  app.route('/api/admin/v1', adminApiRoutes(deps));
   app.route('/admin', adminRoutes(deps));
 
   app.onError((err, c) => {

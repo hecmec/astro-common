@@ -100,3 +100,9 @@ export function pickLang(value: unknown, site?: Site): Lang {
   if (lang && (!site || site.languages.includes(lang))) return lang;
   return site?.languages[0] ?? 'en';
 }
+
+/** Public address of a page of a site (its first domain). */
+export function pageUrl(sites: Sites, siteId: string, path: string): string {
+  const domain = sites.get(siteId)?.domains[0];
+  return domain ? `https://${domain}${path}` : path;
+}
