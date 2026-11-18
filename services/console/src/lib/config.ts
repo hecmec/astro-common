@@ -55,7 +55,7 @@ export function loadConfig(env: Env): ConsoleConfig {
   const problems: string[] = [];
   const umamiUrl = url(env.UMAMI_URL);
   const config: ConsoleConfig = {
-    consoleUrl: url(env.CONSOLE_URL) ?? `http://localhost:${env.PORT ?? 4340}`,
+    consoleUrl: url(env.CONSOLE_URL) ?? `http://localhost:${env.PORT ?? 4331}`,
     commentsApiUrl: url(env.COMMENTS_API_URL) ?? 'http://localhost:4330',
     consoleToken: env.CONSOLE_TOKEN?.trim() ?? '',
     umami: umamiUrl && env.UMAMI_USERNAME && env.UMAMI_PASSWORD ? { url: umamiUrl, username: env.UMAMI_USERNAME, password: env.UMAMI_PASSWORD } : undefined,

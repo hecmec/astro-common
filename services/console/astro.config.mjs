@@ -7,7 +7,7 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'standalone' }),
-  server: { port: 4340 },
+  server: { port: 4331 },
   // The console checks the Origin of state-changing requests against CONSOLE_URL itself
   // (src/middleware.ts): behind Coolify's proxy the request URL Astro sees is not the public one.
   security: { checkOrigin: false },

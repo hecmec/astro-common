@@ -48,7 +48,7 @@ describe('console configuration', () => {
 
   it('has development defaults: localhost, a random session secret, visits and Google off', () => {
     const a = loadConfig({ DEV_MODE: 'true' });
-    expect(a).toMatchObject({ consoleUrl: 'http://localhost:4340', commentsApiUrl: 'http://localhost:4330', consoleToken: '', devMode: true, umami: undefined, google: undefined });
+    expect(a).toMatchObject({ consoleUrl: 'http://localhost:4331', commentsApiUrl: 'http://localhost:4330', consoleToken: '', devMode: true, umami: undefined, google: undefined });
     expect(a.sessionSecret.length).toBeGreaterThanOrEqual(32);
     expect(loadConfig({}).sessionSecret).not.toBe(a.sessionSecret);
   });

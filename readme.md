@@ -17,7 +17,7 @@ Node 24+ locally (production runs Node 26 LTS), pnpm 12.
 
 - `pnpm install`
 - `pnpm dev`: builds the widget and starts the service on :4330 in development mode (localhost origins, dev sign-in, mails printed in the terminal)
-- `pnpm dev:console`: the console on :4340 with a dev sign-in (see [its README](services/console/README.md) for the variables)
+- `pnpm dev:console`: the console on :4331 with a dev sign-in (see [its README](services/console/README.md) for the variables)
 - `pnpm test`: unit tests of all packages
 - `pnpm test:e2e`: browser tests of the comments service and the console (Playwright, Chromium)
 - `pnpm check`: type checks

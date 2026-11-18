@@ -39,7 +39,7 @@ Each site has a colour that recalls it, with a light and a dark step: lime for A
 | `SESSION_SECRET` | Cookie signing key, at least 32 characters (development: random at each start) |
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | The service account's JSON key (raw, or base64 of it), read-only on the four Search Console properties (below). Without it the Search page says the statistics are unavailable |
 | `SEARCH_CONSOLE_API_URL`, `GOOGLE_TOKEN_URL` | Tests only (the browser tests point them at the fake upstream server); refused in production |
-| `PORT`, `HOST` | Default 4340; the image sets `HOST=::` |
+| `PORT`, `HOST` | Default 4331; the image sets `PORT=4340` and `HOST=::` |
 | `DEV_MODE` | Development only (refused when `NODE_ENV=production`): the sign-in page offers a sign-in without Google, still limited to `ADMIN_EMAILS` |
 
 In production, a configuration without `CONSOLE_URL`/`COMMENTS_API_URL` in https, `CONSOLE_TOKEN`, `SESSION_SECRET`, the Google client or `ADMIN_EMAILS` makes every request answer 500, the health check included, and the log lists the problems. Coolify then keeps the previous deployment online.
@@ -60,7 +60,7 @@ In Umami (Settings → Users), create a user `console` with the role **view-only
 ```bash
 # terminal 1, at the repository root: the comments service with its admin API on
 CONSOLE_TOKEN=dev-console-token pnpm dev
-# terminal 2: the console on http://localhost:4340 (dev sign-in)
+# terminal 2: the console on http://localhost:4331 (dev sign-in)
 CONSOLE_TOKEN=dev-console-token ADMIN_EMAILS=you@example.org pnpm dev:console
 ```
 

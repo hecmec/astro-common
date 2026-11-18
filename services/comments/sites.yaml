@@ -33,7 +33,7 @@ sites:
   simplygoodfood:
     name: Simply Good Food
     domains: [www.simplygoodfood.eu, simplygoodfood.eu, simplygoodfood-staging.babelcoach.com]
-    dev_origins: [http://localhost:4321, http://localhost:4399]
+    dev_origins: [http://localhost:4327, http://localhost:4399]
     languages: [en, fr, de]
     bake_after_days: 7
     rebuild: { coolify_app: g6yp37pejztcj1nkupudcfrd }   # production app on Coolify
@@ -57,7 +57,7 @@ sites:
   bonetgratuit:
     name: Bon et gratuit
     domains: [www.bon-et-gratuit.fr, bon-et-gratuit.fr, bon-et-gratuit-staging.babelcoach.com]
-    dev_origins: [http://localhost:4321, http://localhost:4399]
+    dev_origins: [http://localhost:4328, http://localhost:4399]
     languages: [fr]
     bake_after_days: 7
     rebuild: { coolify_app: 6zdj4wvwxth2t2soytgxjn5q }   # production app on Coolify
