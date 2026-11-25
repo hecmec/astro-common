@@ -9,6 +9,7 @@ Code shared by the BabelCoach sites: [alternative-web](../alternative-web) (Alt 
 | [packages/google-auth](packages/google-auth) | Google sign-in (code flow with PKCE), shared by the comments service and the console |
 | [packages/comments-widget](packages/comments-widget) | Browser widget, built into `services/comments/public/widget.js` |
 | [packages/astro-comments](packages/astro-comments) | Astro component the sites put under their pages: bakes old comments into the HTML, loads the widget |
+| [packages/sitemap-dates](packages/sitemap-dates) | Sitemap `lastmod` dates from the pages' `update_date`, translations included |
 | [openspec](openspec) | Specs and changes |
 
 ## Commands

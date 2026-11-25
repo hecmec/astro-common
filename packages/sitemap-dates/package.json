@@ -1,0 +1,21 @@
+{
+  "name": "@babelcoach/sitemap-dates",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sitemap lastmod dates of a BabelCoach site, from the update_date of its pages, translations included.",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "check": "tsc -p .",
+    "test": "vitest run"
+  }
+}
